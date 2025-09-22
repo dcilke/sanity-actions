@@ -44,8 +44,6 @@ jobs:
       - name: Create preview dataset
         uses: dcilke/sanity-actions/dataset-import@v1
         with:
-          project-id: ${{ secrets.SANITY_PROJECT_ID }}
-          dataset: ${{ steps.preview.outputs.dataset }}
           token: ${{ secrets.SANITY_AUTH_TOKEN }}
           input-path: ./data/preview-seed.ndjson
           create-dataset: true
@@ -56,21 +54,19 @@ jobs:
         uses: dcilke/sanity-actions/build-and-deploy@v1
         with:
           # Core configuration
-          project-id: ${{ secrets.SANITY_PROJECT_ID }}
-          dataset: ${{ steps.preview.outputs.dataset }}
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
           studio-hostname: ${{ steps.preview.outputs.hostname }}
 
           # Build configuration for preview
           build: true
           cache-dependencies: true
-          upload-artifacts: true              # Keep preview build artifacts
+          upload-artifacts: true # Keep preview build artifacts
           artifact-name: preview-build-pr-${{ github.event.pull_request.number }}
 
           # Development-friendly build settings
-          source-maps: true                   # Enable source maps for debugging
-          no-minify: true                     # Skip minification for easier debugging
-          schema-required: false              # Allow experimental schemas in previews
+          source-maps: true # Enable source maps for debugging
+          no-minify: true # Skip minification for easier debugging
+          schema-required: false # Allow experimental schemas in previews
 
           # Preview environment variables
           environment-variables: |
@@ -84,12 +80,12 @@ jobs:
           deploy-graphql: true
           graphql-tag: preview-${{ github.event.pull_request.number }}
           graphql-dataset: ${{ steps.preview.outputs.dataset }}
-          graphql-playground: true            # Always enable playground for previews
+          graphql-playground: true # Always enable playground for previews
 
           # Deployment settings
           wait-for-deployment: true
-          deployment-timeout: 30              # Shorter timeout for previews
-          comment-on-pr: false                # We'll create a custom comment
+          deployment-timeout: 30 # Shorter timeout for previews
+          comment-on-pr: false # We'll create a custom comment
 
       - name: Comment preview URL
         uses: actions/github-script@v7

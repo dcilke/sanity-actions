@@ -13,31 +13,23 @@ Builds and deploys your Sanity Studio and/or GraphQL API to Sanity's hosted serv
 # Build and deploy Studio (default behavior)
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   with:
-    project-id: ${{ secrets.SANITY_PROJECT_ID }}
-    dataset: 'production'
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
 
 # Build and deploy both Studio and GraphQL API
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   with:
-    project-id: ${{ secrets.SANITY_PROJECT_ID }}
-    dataset: 'production'
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
     deploy-graphql: true
 
 # Deploy without building (using pre-built files)
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   with:
-    project-id: ${{ secrets.SANITY_PROJECT_ID }}
-    dataset: 'production'
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
     build: false  # Skip build step
 
 # Just build the Studio (no deployment)
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   with:
-    project-id: ${{ secrets.SANITY_PROJECT_ID }}
-    dataset: 'production'
     deploy-studio: false
     deploy-graphql: false
 ```
@@ -49,8 +41,6 @@ Builds and deploys your Sanity Studio and/or GraphQL API to Sanity's hosted serv
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   with:
     # Required inputs
-    project-id: ${{ secrets.SANITY_PROJECT_ID }}
-    dataset: 'production'
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
 
     # Project configuration
@@ -84,11 +74,6 @@ Builds and deploys your Sanity Studio and/or GraphQL API to Sanity's hosted serv
     upload-artifacts: true    # Upload build artifacts (default: false)
     artifact-name: 'studio-build'  # Artifact name (default: 'sanity-build')
     comment-on-pr: true      # Comment on PR with deployment info (default: true)
-
-    # Environment variables (one per line)
-    environment-variables: |
-      SANITY_API_VERSION=2024-01-01
-      CUSTOM_VAR=value
 ```
 
 #### Outputs
@@ -99,8 +84,6 @@ The action provides the following outputs that can be used in subsequent steps:
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   id: deploy
   with:
-    project-id: ${{ secrets.SANITY_PROJECT_ID }}
-    dataset: 'production'
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
 
 - name: Use deployment outputs

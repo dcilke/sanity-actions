@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Deployment environment'
+        description: "Deployment environment"
         required: true
         type: choice
         options:
@@ -37,7 +37,7 @@ jobs:
           - branch: main
             environment: production
             dataset: production
-            hostname-suffix: ''
+            hostname-suffix: ""
 
     steps:
       - name: Checkout repository
@@ -80,7 +80,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
+          cache: "npm"
 
       - name: Setup Sanity
         uses: dcilke/sanity-actions/setup-sanity@v1
@@ -91,8 +91,6 @@ jobs:
         uses: dcilke/sanity-actions/build-and-deploy@v1
         with:
           # Core configuration
-          project-id: ${{ secrets.SANITY_PROJECT_ID }}
-          dataset: ${{ steps.env.outputs.dataset }}
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
           studio-hostname: ${{ steps.env.outputs.hostname }}
 
@@ -130,11 +128,8 @@ jobs:
         if: steps.env.outputs.environment == 'production'
         uses: dcilke/sanity-actions/dataset-export@v1
         with:
-          project-id: ${{ secrets.SANITY_PROJECT_ID }}
-          dataset: production
           token: ${{ secrets.SANITY_AUTH_TOKEN }}
           output-path: ./backups/production-backup
           compress: true
           upload-artifact: true
           artifact-name: production-backup-${{ github.run_number }}
-

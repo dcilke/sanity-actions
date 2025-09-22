@@ -23,8 +23,6 @@ jobs:
         uses: dcilke/sanity-actions/build-and-deploy@v1
         with:
           # Required configuration
-          project-id: ${{ secrets.SANITY_PROJECT_ID }}
-          dataset: production
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
 
           # Studio configuration
@@ -32,16 +30,16 @@ jobs:
           studio-hostname: my-studio
 
           # Build configuration (all optional)
-          build: true                    # Enable/disable build (default: true)
-          output-path: dist              # Build output directory (default: dist)
-          cache-dependencies: true       # Cache node_modules (default: true)
-          upload-artifacts: false        # Upload build artifacts (default: false)
+          build: true # Enable/disable build (default: true)
+          output-path: dist # Build output directory (default: dist)
+          cache-dependencies: true # Cache node_modules (default: true)
+          upload-artifacts: false # Upload build artifacts (default: false)
 
           # Production build optimizations
-          source-maps: false             # Include source maps (default: false)
-          no-minify: false              # Skip minification (default: false)
+          source-maps: false # Include source maps (default: false)
+          no-minify: false # Skip minification (default: false)
           # schema-path: ./schema.json   # Custom schema path (optional)
-          schema-required: true          # Fail if schema unserializable (default: true)
+          schema-required: true # Fail if schema unserializable (default: true)
 
           # Environment variables for build
           environment-variables: |
@@ -49,5 +47,5 @@ jobs:
             SANITY_STUDIO_PREVIEW_SECRET=${{ secrets.PREVIEW_SECRET }}
 
           # Deployment options
-          wait-for-deployment: true      # Wait for deployment to be ready
-          comment-on-pr: true           # Comment deployment URL on PR
+          wait-for-deployment: true # Wait for deployment to be ready
+          comment-on-pr: true # Comment deployment URL on PR
