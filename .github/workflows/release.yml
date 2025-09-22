@@ -55,55 +55,104 @@ jobs:
 
       - name: Generate changelog
         id: changelog
-        run: |
-          # Get the previous tag
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ github.ref_name }}^ 2>/dev/null || echo "")
-
-          if [ -n "$PREVIOUS_TAG" ]; then
-            echo "📝 Generating changelog from $PREVIOUS_TAG to ${{ github.ref_name }}"
-
-            # Generate changelog
-            CHANGELOG=$(git log $PREVIOUS_TAG..${{ github.ref_name }} --pretty=format:"- %s (%an)" --reverse)
-
-            # Create full changelog with sections
-            cat << EOF > CHANGELOG.md
-          ## What's Changed in ${{ github.ref_name }}
-
-          ### Commits
-          $CHANGELOG
-
-          ### Contributors
-          $(git log $PREVIOUS_TAG..${{ github.ref_name }} --pretty=format:"%an" | sort -u | sed 's/^/- @/')
-
-          **Full Changelog**: https://github.com/${{ github.repository }}/compare/$PREVIOUS_TAG...${{ github.ref_name }}
-          EOF
-          else
-            echo "📝 First release - no previous tag found"
-            cat << EOF > CHANGELOG.md
-          ## Initial Release ${{ github.ref_name }}
-
-          This is the first release of Sanity Actions.
-
-          ### Features
-          - Build and deploy Sanity Studio
-          - Deploy GraphQL API
-          - Multi-package manager support (npm, yarn, pnpm)
-          - GitHub deployment integration
-          - PR comment automation
-          - Build artifact uploading
-          EOF
-          fi
-
-          # Output changelog for the release
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          cat CHANGELOG.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Create Release
         uses: actions/github-script@v7
         with:
           script: |
-            const changelog = `${{ steps.changelog.outputs.changelog }}`;
+            const { execSync } = require('child_process');
+
+            // Get the previous tag
+            let previousTag = '';
+            try {
+              previousTag = execSync(`git describe --tags --abbrev=0 ${context.ref.replace('refs/tags/', '')}^ 2>/dev/null || echo ""`).toString().trim();
+            } catch (e) {
+              previousTag = '';
+            }
+
+            let changelog = '';
+
+            if (previousTag) {
+              console.log(`📝 Generating changelog from ${previousTag} to ${context.ref.replace('refs/tags/', '')}`);
+
+              // Get commits between tags
+              const commitRange = `${previousTag}..${context.ref.replace('refs/tags/', '')}`;
+              const commits = execSync(`git log ${commitRange} --pretty=format:"%H|%s" --reverse`).toString().trim().split('\n').filter(Boolean);
+
+              // Get commit details with proper GitHub handles
+              const commitDetails = [];
+              const contributorSet = new Set();
+
+              for (const commit of commits) {
+                const [sha, message] = commit.split('|');
+
+                try {
+                  // Get commit details from GitHub API
+                  const { data: commitData } = await github.rest.repos.getCommit({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: sha
+                  });
+
+                  const author = commitData.author?.login ? `@${commitData.author.login}` : commitData.commit.author.name;
+                  commitDetails.push(`- ${message} (${author})`);
+
+                  if (commitData.author?.login) {
+                    contributorSet.add(`@${commitData.author.login}`);
+                  } else {
+                    contributorSet.add(commitData.commit.author.name);
+                  }
+                } catch (e) {
+                  // Fallback to git log data if API fails
+                  const authorName = execSync(`git log -1 --pretty=format:"%an" ${sha}`).toString().trim();
+                  commitDetails.push(`- ${message} (${authorName})`);
+                  contributorSet.add(authorName);
+                }
+              }
+
+              const contributors = Array.from(contributorSet).sort().map(c => `- ${c}`).join('\n');
+
+              const changelogParts = [
+                `## What's Changed in ${context.ref.replace('refs/tags/', '')}`,
+                '',
+                '### Commits',
+                commitDetails.join('\n'),
+                '',
+                '### Contributors',
+                contributors,
+                '',
+                `**Full Changelog**: https://github.com/${context.repo.owner}/${context.repo.repo}/compare/${previousTag}...${context.ref.replace('refs/tags/', '')}`
+              ];
+
+              changelog = changelogParts.join('\n');
+            } else {
+              console.log('📝 First release - no previous tag found');
+
+              const changelogParts = [
+                `## Initial Release ${context.ref.replace('refs/tags/', '')}`,
+                '',
+                'This is the first release of Sanity Actions.',
+                '',
+                '### Features',
+                '- Build and deploy Sanity Studio',
+                '- Deploy GraphQL API',
+                '- Multi-package manager support (npm, yarn, pnpm)',
+                '- GitHub deployment integration',
+                '- PR comment automation',
+                '- Build artifact uploading'
+              ];
+
+              changelog = changelogParts.join('\n');
+            }
+
+            // Set output
+            core.setOutput('changelog', changelog);
+
+      - name: Create Release
+        env:
+          CHANGELOG: ${{ steps.changelog.outputs.changelog }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const changelog = process.env.CHANGELOG || '';
             const tagName = '${{ github.ref_name }}';
             const isPrerelease = tagName.includes('-alpha') || tagName.includes('-beta') || tagName.includes('-rc');
 
