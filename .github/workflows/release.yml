@@ -1,0 +1,168 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v2.1.0, etc.
+
+permissions:
+  contents: write  # Need write permission to create releases
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for changelog generation
+          # Explicitly fetch the tag and main branch
+          ref: ${{ github.ref }}
+
+      - name: Validate tag is on main branch
+        run: |
+          echo "🔍 Validating tag ${{ github.ref_name }} is on main branch..."
+
+          # Fetch the main branch to ensure we have the latest
+          git fetch origin main --force --tags
+
+          # Get the commit SHA that this tag points to
+          TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref_name }})
+          echo "Tag commit: $TAG_COMMIT"
+
+          # Get all commits on main branch
+          MAIN_COMMITS=$(git rev-list origin/main)
+
+          # Check if tag commit exists in main branch history
+          if echo "$MAIN_COMMITS" | grep -q "^$TAG_COMMIT$"; then
+            echo "✅ Tag ${{ github.ref_name }} is on main branch"
+
+            # Additional info
+            echo "Tag message:"
+            git tag -l --format='%(contents)' ${{ github.ref_name }}
+          else
+            echo "❌ ERROR: Tag ${{ github.ref_name }} is NOT on main branch!"
+            echo "This tag points to commit $TAG_COMMIT which is not in main's history."
+            echo ""
+            echo "To create a release, the tag must be on the main branch."
+            echo "You can create a proper tag with:"
+            echo "  git checkout main"
+            echo "  git pull origin main"
+            echo "  git tag -a ${{ github.ref_name }} -m \"Your release message\""
+            echo "  git push origin ${{ github.ref_name }}"
+            exit 1
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ github.ref_name }}^ 2>/dev/null || echo "")
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            echo "📝 Generating changelog from $PREVIOUS_TAG to ${{ github.ref_name }}"
+
+            # Generate changelog
+            CHANGELOG=$(git log $PREVIOUS_TAG..${{ github.ref_name }} --pretty=format:"- %s (%an)" --reverse)
+
+            # Create full changelog with sections
+            cat << EOF > CHANGELOG.md
+          ## What's Changed in ${{ github.ref_name }}
+
+          ### Commits
+          $CHANGELOG
+
+          ### Contributors
+          $(git log $PREVIOUS_TAG..${{ github.ref_name }} --pretty=format:"%an" | sort -u | sed 's/^/- @/')
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/$PREVIOUS_TAG...${{ github.ref_name }}
+          EOF
+          else
+            echo "📝 First release - no previous tag found"
+            cat << EOF > CHANGELOG.md
+          ## Initial Release ${{ github.ref_name }}
+
+          This is the first release of Sanity Actions.
+
+          ### Features
+          - Build and deploy Sanity Studio
+          - Deploy GraphQL API
+          - Multi-package manager support (npm, yarn, pnpm)
+          - GitHub deployment integration
+          - PR comment automation
+          - Build artifact uploading
+          EOF
+          fi
+
+          # Output changelog for the release
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat CHANGELOG.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const changelog = `${{ steps.changelog.outputs.changelog }}`;
+            const tagName = '${{ github.ref_name }}';
+            const isPrerelease = tagName.includes('-alpha') || tagName.includes('-beta') || tagName.includes('-rc');
+
+            try {
+              const release = await github.rest.repos.createRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: tagName,
+                name: `Release ${tagName}`,
+                body: changelog,
+                draft: false,
+                prerelease: isPrerelease,
+                generate_release_notes: false  // We're providing our own changelog
+              });
+
+              console.log(`✅ Release created: ${release.data.html_url}`);
+            } catch (error) {
+              console.error('Failed to create release:', error);
+              throw error;
+            }
+
+      - name: Update major version tag
+        if: "!contains(github.ref_name, '-')"  # Only for stable releases (no pre-release suffix)
+        run: |
+          # Extract major version from tag (e.g., v1.2.3 -> v1)
+          MAJOR_VERSION=$(echo ${{ github.ref_name }} | grep -oE '^v[0-9]+')
+
+          if [ -n "$MAJOR_VERSION" ]; then
+            echo "📌 Updating major version tag: $MAJOR_VERSION"
+
+            # Force update the major version tag to point to this release
+            git tag -fa $MAJOR_VERSION -m "Update $MAJOR_VERSION to ${{ github.ref_name }}"
+            git push origin $MAJOR_VERSION --force
+
+            echo "✅ Major version tag $MAJOR_VERSION updated"
+          else
+            echo "⚠️ Could not extract major version from tag ${{ github.ref_name }}"
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tagName = '${{ github.ref_name }}';
+            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+
+            // Create an issue for failed release
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Release failed for tag ${tagName}`,
+              body: `The automatic release creation failed for tag \`${tagName}\`.
+
+              Please check the [workflow run](${runUrl}) for details.
+
+              You may need to:
+              1. Fix any issues and re-run the workflow
+              2. Create the release manually
+              3. Update the major version tag manually if needed`,
+              labels: ['release', 'bug']
+            });
