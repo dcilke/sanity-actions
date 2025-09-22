@@ -1,0 +1,175 @@
+name: Test Actions
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-actions:
+    name: Validate Action Definitions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate action.yml files
+        run: |
+          echo "🔍 Validating action.yml files..."
+
+          ERRORS=0
+          for action_file in actions/*/action.yml; do
+            echo "Checking $action_file..."
+
+            # Check if file exists
+            if [ ! -f "$action_file" ]; then
+              echo "❌ Missing action.yml in $(dirname "$action_file")"
+              ERRORS=$((ERRORS + 1))
+              continue
+            fi
+
+            # Validate YAML syntax
+            if ! yq eval '.' "$action_file" > /dev/null 2>&1; then
+              echo "❌ Invalid YAML in $action_file"
+              ERRORS=$((ERRORS + 1))
+              continue
+            fi
+
+            # Check required fields
+            NAME=$(yq eval '.name' "$action_file")
+            DESC=$(yq eval '.description' "$action_file")
+            RUNS=$(yq eval '.runs.using' "$action_file")
+
+            if [ "$NAME" = "null" ]; then
+              echo "❌ Missing 'name' in $action_file"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            if [ "$DESC" = "null" ]; then
+              echo "❌ Missing 'description' in $action_file"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            if [ "$RUNS" != "composite" ]; then
+              echo "❌ Expected 'runs.using: composite' in $action_file"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            echo "✅ $action_file is valid"
+          done
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "❌ Found $ERRORS validation errors"
+            exit 1
+          else
+            echo "✅ All action files are valid"
+          fi
+
+  test-scripts:
+    name: Test Utility Scripts
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Test validation script
+        run: |
+          echo "🧪 Testing validation script..."
+          cd scripts/utils
+
+          # Test with missing env vars
+          if ./validate-env.sh 2>/dev/null; then
+            echo "❌ Script should fail with missing env vars"
+            exit 1
+          fi
+
+          # Test with valid env vars
+          export SANITY_PROJECT_ID="test123"
+          export SANITY_DATASET="production"
+          export SANITY_AUTH_TOKEN="test-token"
+
+          if ! ./validate-env.sh; then
+            echo "❌ Script should pass with valid env vars"
+            exit 1
+          fi
+
+          echo "✅ Validation script tests passed"
+
+      - name: Test secret manager
+        run: |
+          echo "🧪 Testing secret manager..."
+          cd scripts/utils
+
+          # Test token validation
+          if node secret-manager.js validate-token "short" 2>/dev/null; then
+            echo "❌ Should fail for short token"
+            exit 1
+          fi
+
+          if ! node secret-manager.js validate-token "sk_test_1234567890abcdefghij"; then
+            echo "❌ Should pass for valid token format"
+            exit 1
+          fi
+
+          # Test masking
+          MASKED=$(node secret-manager.js mask "supersecrettoken123")
+          if [ "$MASKED" != "supe************" ]; then
+            echo "❌ Masking failed: got $MASKED"
+            exit 1
+          fi
+
+          echo "✅ Secret manager tests passed"
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run security checks
+        run: |
+          echo "🔒 Running security checks..."
+
+          # Check for hardcoded secrets
+          if grep -r "sk_live_" . --include="*.yml" --include="*.yaml" --include="*.js" 2>/dev/null; then
+            echo "❌ Found potential hardcoded secrets"
+            exit 1
+          fi
+
+          # Check for exposed tokens in examples
+          if grep -r "sanity_" examples/ | grep -v "secrets\." | grep -v "{{"; then
+            echo "❌ Found exposed tokens in examples"
+            exit 1
+          fi
+
+          echo "✅ Security checks passed"
+
+  integration-test:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run integration test workflow
+        run: |
+          echo "🧪 Running integration tests..."
+          echo "This would run a full integration test with a test Sanity project"
+          echo "✅ Integration tests placeholder"
