@@ -1,0 +1,53 @@
+name: Deploy Sanity Studio
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Sanity
+        uses: dcilke/sanity-actions/setup-sanity@v1
+        with:
+          token: ${{ secrets.SANITY_AUTH_TOKEN }}
+
+      - name: Build and Deploy Studio
+        uses: dcilke/sanity-actions/build-and-deploy@v1
+        with:
+          # Required configuration
+          project-id: ${{ secrets.SANITY_PROJECT_ID }}
+          dataset: production
+          token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+
+          # Studio configuration
+          project-path: ./studio
+          studio-hostname: my-studio
+
+          # Build configuration (all optional)
+          build: true                    # Enable/disable build (default: true)
+          output-path: dist              # Build output directory (default: dist)
+          cache-dependencies: true       # Cache node_modules (default: true)
+          upload-artifacts: false        # Upload build artifacts (default: false)
+
+          # Production build optimizations
+          source-maps: false             # Include source maps (default: false)
+          no-minify: false              # Skip minification (default: false)
+          # schema-path: ./schema.json   # Custom schema path (optional)
+          schema-required: true          # Fail if schema unserializable (default: true)
+
+          # Environment variables for build
+          environment-variables: |
+            SANITY_STUDIO_API_VERSION=2023-08-01
+            SANITY_STUDIO_PREVIEW_SECRET=${{ secrets.PREVIEW_SECRET }}
+
+          # Deployment options
+          wait-for-deployment: true      # Wait for deployment to be ready
+          comment-on-pr: true           # Comment deployment URL on PR

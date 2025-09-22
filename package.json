@@ -1,0 +1,30 @@
+{
+  "name": "@sanity/github-actions",
+  "version": "1.0.0",
+  "description": "GitHub Actions for building and deploying Sanity.io projects",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dcilke/sanity-actions.git"
+  },
+  "keywords": [
+    "sanity",
+    "github-actions",
+    "deployment",
+    "ci-cd"
+  ],
+  "author": "Sanity.io",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint . --ext .js,.ts",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.5.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
