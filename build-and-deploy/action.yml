@@ -157,35 +157,34 @@ runs:
     # Setup Node.js
     - name: Setup Node.js
       uses: actions/setup-node@v4
-      working-directory: ${{ inputs.path }}
       with:
         node-version: "lts"
 
     # Detect package manager
     - name: Detect package manager
       id: package-manager
-      working-directory: ${{ inputs.path }}
       shell: bash
-      run: node ${{ github.action_path }}/src/cmd/set-package-manager.js
+      run: |
+        cd ${{ inputs.path }}
+        node ${{ github.action_path }}/src/cmd/set-package-manager.js
 
     # Setup package manager
     - name: Setup pnpm
       if: steps.package-manager.outputs.manager == 'pnpm'
       uses: pnpm/action-setup@v2
-      working-directory: ${{ inputs.path }}
       with:
         version: 8
 
     - name: Setup Corepack
       if: steps.package-manager.outputs.manager == 'yarn'
-      working-directory: ${{ inputs.path }}
       shell: bash
-      run: corepack enable
+      run: |
+        cd ${{ inputs.path }}
+        corepack enable
 
     # Cache dependencies
     - name: Cache dependencies
       if: inputs.cache-dependencies == 'true'
-      working-directory: ${{ inputs.path }}
       uses: actions/cache@v3
       with:
         path: |
@@ -197,7 +196,6 @@ runs:
 
     - name: Cache Sanity CLI
       if: inputs.cache-sanity-cli == 'true' && inputs.cli-version !== ''
-      working-directory: ${{ inputs.path }}
       uses: actions/cache@v3
       with:
         path: ${{ github.workspace }}/.sanity-cli
@@ -208,9 +206,10 @@ runs:
     # Build and deploy
     - name: Build and deploy
       id: build-and-deploy
-      working-directory: ${{ inputs.path }}
       shell: bash
-      run: node ${{ github.action_path }}/src/cmd/build-and-deploy.js
+      run: |
+        cd ${{ inputs.path }}
+        node ${{ github.action_path }}/src/cmd/build-and-deploy.js
 
     # Upload artifacts
     - name: Upload build artifacts
@@ -219,7 +218,6 @@ runs:
         inputs.build == 'true' &&
         steps.build-studio.outputs.path != ''
       uses: actions/upload-artifact@v3
-      working-directory: ${{ inputs.path }}
       with:
         name: ${{ inputs.artifact-name }}
         path: ${{ steps.build-and-deploy.outputs.dist }}
