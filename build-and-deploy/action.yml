@@ -185,7 +185,7 @@ runs:
     # Cache dependencies
     - name: Cache dependencies
       if: inputs.cache-dependencies == 'true'
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ${{ steps.package-manager.outputs.cache-dir }}
@@ -196,7 +196,7 @@ runs:
 
     - name: Cache Sanity CLI
       if: inputs.cache-sanity-cli == 'true' && inputs.cli-version != ''
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/.sanity-cli
         key: ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-${{ inputs.cli-version != '' && inputs.cli-version || 'latest' }}
@@ -217,7 +217,7 @@ runs:
         inputs.upload-artifacts == 'true' &&
         inputs.build == 'true' &&
         steps.build-studio.outputs.path != ''
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact-name }}
         path: ${{ steps.build-and-deploy.outputs.dist }}
