@@ -1,0 +1,225 @@
+name: "Build and Deploy Sanity"
+description: "Build and deploy Sanity Studio and/or GraphQL API with automatic PR preview deployments"
+author: "dcilke"
+branding:
+  icon: "upload-cloud"
+  color: "red"
+
+inputs:
+  # Required inputs
+  token:
+    description: "Sanity auth token for deployment"
+    required: true
+
+  # Project configuration
+  path:
+    description: "Path to Sanity studio"
+    required: false
+    default: "."
+  cli-version:
+    description: "Version of Sanity CLI to install"
+    required: false
+    default: ""
+
+  # Build configuration
+  build:
+    description: "Build the project before deploying"
+    required: false
+    default: "true"
+  studio-output-path:
+    description: "Studio build output directory"
+    required: false
+    default: ""
+  studio-source-maps:
+    description: "Include Studio source maps in build"
+    required: false
+    default: "false"
+  studio-no-minify:
+    description: "Skip Studio bundle minification"
+    required: false
+    default: "false"
+  schema-path:
+    description: "Path to schema file"
+    required: false
+    default: ""
+  schema-workspace:
+    description: "Name of workspace to generate (defaults to all workspaces)"
+    required: false
+    default: ""
+  schema-enforce-required-fields:
+    description: "Makes the schema generated treat fields marked as required as non-optional"
+    required: false
+    default: "false"
+  schema-required:
+    description: "Fail if schema is unserializable"
+    required: false
+    default: "true"
+
+  # Deployment configuration
+  deploy-studio:
+    description: "Deploy Sanity Studio"
+    required: false
+    default: "true"
+  deploy-graphql:
+    description: "Deploy GraphQL API"
+    required: false
+    default: "false"
+
+  # GraphQL configuration
+  graphql-override-tag:
+    description: "Override GraphQL tag (PR deployments use branch name)"
+    required: false
+    default: ""
+  graphql-override-dataset:
+    description: "Override GraphQL dataset"
+    required: false
+    default: ""
+  graphql-override-playground:
+    description: "Override GraphQL playground setting"
+    required: false
+    default: ""
+  graphql-override-generation:
+    description: "Override GraphQL generation"
+    required: false
+    default: ""
+  graphql-override-non-null-document-fields:
+    description: "Override non-null document fields setting"
+    required: false
+    default: ""
+  graphql-override-with-union-cache:
+    description: "Experimental: Enable union cache"
+    required: false
+    default: ""
+
+  # CI/CD features
+  cache-dependencies:
+    description: "Cache package manager dependencies"
+    required: false
+    default: "true"
+  cache-sanity-cli:
+    description: "Emit cache metadata for the local Sanity CLI install"
+    required: false
+    default: "false"
+  upload-artifacts:
+    description: "Upload build artifacts"
+    required: false
+    default: "false"
+  artifact-name:
+    description: "Name for uploaded artifacts"
+    required: false
+    default: "sanity-build"
+  comment-on-pr:
+    description: "Comment deployment details on PR"
+    required: false
+    default: "true"
+  create-github-deployment:
+    description: "Create GitHub deployment records"
+    required: false
+    default: "true"
+
+  # Advanced options
+  github-token:
+    description: "GitHub token for PR comments and deployments"
+    required: false
+    default: ${{ github.token }}
+  environment-variables:
+    description: "Environment variables in KEY=value format"
+    required: false
+    default: ""
+
+outputs:
+  # Build outputs
+  build-path:
+    description: "Path to built files"
+    value: ${{ steps.build-and-deploy.outputs.dist }}
+
+  # Studio outputs
+  studio-url:
+    description: "Deployed Studio URL"
+    value: ${{ steps.build-and-deploy.outputs.studio-url }}
+
+  # GraphQL outputs
+  graphql-urls:
+    description: "GraphQL API endpoints"
+    value: ${{ steps.build-and-deploy.outputs.graphql-urls }}
+
+  # PR deployment outputs
+  deployment-id:
+    description: "PR deployment ID (if in PR context)"
+    value: ${{ steps.build-and-deploy.outputs.deployment_id }}
+  is-preview-deployment:
+    description: "Whether this is a preview (PR) deployment"
+    value: ${{ steps.build-and-deploy.outputs.is_pr }}
+
+runs:
+  using: "composite"
+  steps:
+    # Setup Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      working-directory: ${{ inputs.path }}
+      with:
+        node-version: "lts"
+
+    # Detect package manager
+    - name: Detect package manager
+      id: package-manager
+      working-directory: ${{ inputs.path }}
+      shell: bash
+      run: node ${{ github.action_path }}/src/cmd/set-package-manager.js
+
+    # Setup package manager
+    - name: Setup pnpm
+      if: steps.package-manager.outputs.manager == 'pnpm'
+      uses: pnpm/action-setup@v2
+      working-directory: ${{ inputs.path }}
+      with:
+        version: 8
+
+    - name: Setup Corepack
+      if: steps.package-manager.outputs.manager == 'yarn'
+      working-directory: ${{ inputs.path }}
+      shell: bash
+      run: corepack enable
+
+    # Cache dependencies
+    - name: Cache dependencies
+      if: inputs.cache-dependencies == 'true'
+      working-directory: ${{ inputs.path }}
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ steps.package-manager.outputs.cache-dir }}
+          ${{ inputs.path }}/node_modules
+        key: ${{ runner.os }}-${{ steps.package-manager.outputs.manager }}-${{ hashFiles(format('{0}/**/package-lock.json', inputs.path), format('{0}/**/yarn.lock', inputs.path), format('{0}/**/pnpm-lock.yaml', inputs.path)) }}
+        restore-keys: |
+          ${{ runner.os }}-${{ steps.package-manager.outputs.manager }}-
+
+    - name: Cache Sanity CLI
+      if: inputs.cache-sanity-cli == 'true' && inputs.cli-version !== ''
+      working-directory: ${{ inputs.path }}
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.sanity-cli
+        key: ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-${{ inputs.cli-version != '' && inputs.cli-version || 'latest' }}
+        restore-keys: |
+          ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-
+
+    # Build and deploy
+    - name: Build and deploy
+      id: build-and-deploy
+      working-directory: ${{ inputs.path }}
+      shell: bash
+      run: node ${{ github.action_path }}/src/cmd/build-and-deploy.js
+
+    # Upload artifacts
+    - name: Upload build artifacts
+      if: |
+        inputs.upload-artifacts == 'true' &&
+        inputs.build == 'true' &&
+        steps.build-studio.outputs.path != ''
+      uses: actions/upload-artifact@v3
+      working-directory: ${{ inputs.path }}
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.build-and-deploy.outputs.dist }}

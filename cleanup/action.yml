@@ -1,0 +1,102 @@
+name: "Cleanup Sanity Preview"
+description: "Remove PR preview deployments for Sanity GraphQL APIs"
+author: "dcilke"
+
+inputs:
+  # Required inputs
+  token:
+    description: "Sanity auth token for cleanup"
+    required: true
+
+  # Project configuration
+  path:
+    description: "Path to Sanity studio"
+    required: false
+    default: "."
+  cli-version:
+    description: "Version of Sanity CLI to install"
+    required: false
+    default: ""
+  studio-cleanup:
+    description: "Run sanity studio cleanup for the environment"
+    required: false
+    default: "true"
+  graphql-cleanup:
+    description: "Run sanity graphql undeploy for the environment"
+    required: false
+    default: "true"
+  graphql-override-tag:
+    description: "Override GraphQL tag (PR deployments use branch name)"
+    required: false
+    default: ""
+  graphql-override-dataset:
+    description: "Override GraphQL dataset"
+    required: false
+    default: ""
+
+  # CI/CD features
+  cache-sanity-cli:
+    description: "Emit cache metadata for the local Sanity CLI install"
+    required: false
+    default: "false"
+  comment-on-pr:
+    description: "Comment cleanup status on the pull request"
+    required: false
+    default: "true"
+
+  # Advanced options
+  github-token:
+    description: "GitHub token for PR comments"
+    required: false
+    default: ${{ github.token }}
+  environment-variables:
+    description: "Environment variables in KEY=value format"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    # Setup Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      working-directory: ${{ inputs.path }}
+      with:
+        node-version: "lts"
+
+    # Detect package manager
+    - name: Detect package manager
+      id: package-manager
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: node ${{ github.action_path }}/src/cmd/set-package-manager.js
+
+    # Setup package manager
+    - name: Setup pnpm
+      if: steps.package-manager.outputs.manager == 'pnpm'
+      uses: pnpm/action-setup@v2
+      working-directory: ${{ inputs.path }}
+      with:
+        version: 8
+
+    - name: Setup Corepack
+      if: steps.package-manager.outputs.manager == 'yarn'
+      working-directory: ${{ inputs.path }}
+      shell: bash
+      run: corepack enable
+
+    - name: Cache Sanity CLI
+      if: inputs.cache-sanity-cli == 'true'
+      working-directory: ${{ inputs.path }}
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.sanity-cli
+        key: ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-${{ inputs.cli-version != '' && inputs.cli-version || 'latest' }}
+        restore-keys: |
+          ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-
+
+    - name: Cleanup deployment
+      id: cleanup
+      working-directory: ${{ inputs.path }}
+      shell: bash
+      run: node ${{ github.action_path }}/src/cmd/cleanup.js
