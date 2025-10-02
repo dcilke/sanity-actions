@@ -195,7 +195,7 @@ runs:
           ${{ runner.os }}-${{ steps.package-manager.outputs.manager }}-
 
     - name: Cache Sanity CLI
-      if: inputs.cache-sanity-cli == 'true' && inputs.cli-version !== ''
+      if: inputs.cache-sanity-cli == 'true' && inputs.cli-version != ''
       uses: actions/cache@v3
       with:
         path: ${{ github.workspace }}/.sanity-cli
