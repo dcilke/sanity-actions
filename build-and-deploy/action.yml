@@ -166,7 +166,7 @@ runs:
       shell: bash
       run: |
         cd ${{ inputs.path }}
-        node ${{ github.action_path }}/src/cmd/set-package-manager.js
+        node ${{ github.action_path }}/../src/cmd/set-package-manager.js
 
     # Setup package manager
     - name: Setup pnpm
@@ -209,7 +209,7 @@ runs:
       shell: bash
       run: |
         cd ${{ inputs.path }}
-        node ${{ github.action_path }}/src/cmd/build-and-deploy.js
+        node ${{ github.action_path }}/../src/cmd/build-and-deploy.js
 
     # Upload artifacts
     - name: Upload build artifacts
