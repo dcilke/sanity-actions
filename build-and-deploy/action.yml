@@ -160,6 +160,13 @@ runs:
       with:
         node-version: "lts/*"
 
+    # Install action dependencies
+    - name: Install action dependencies
+      shell: bash
+      run: |
+        cd ${{ github.action_path }}/..
+        npm install --production --no-save
+
     # Detect package manager
     - name: Detect package manager
       id: package-manager
