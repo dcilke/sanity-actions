@@ -113,13 +113,12 @@ function buildDeploymentComment(cfg) {
 export async function commentOnPR(cfg) {
   try {
     const {isPR} = cfg
-    const commentBody = buildDeploymentComment(cfg)
 
     if (!isPR) {
-      info(commentBody)
       return
     }
 
+    const commentBody = buildDeploymentComment(cfg)
     const {owner, repo} = getRepoDetails()
     const prNumber = getPullRequestNumber()
     const octokit = getOctokitClient()
