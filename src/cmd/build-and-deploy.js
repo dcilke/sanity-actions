@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import {debug, setFailed, setOutput} from '../lib/core.js'
+import {info, setFailed, setOutput} from '../lib/core.js'
 import {buildSchema} from '../steps/build-schema.js'
 import {buildStudio} from '../steps/build-studio.js'
 import {commentOnPR} from '../steps/comment-on-pr.js'
@@ -15,14 +15,6 @@ import {setPRStatus} from '../steps/set-pr-status.js'
 export async function buildAndDeploy() {
   // Setup
   await setPRStatus('pending', 'Sanity build and deploy in progress...')
-
-  // Debug: Log all INPUT_ environment variables
-  debug('Environment variables:')
-  Object.keys(process.env)
-    .filter((key) => key.startsWith('INPUT_'))
-    .forEach((key) => {
-      debug(`${key}=${process.env[key]}`)
-    })
 
   setEnvVars() // including auth token
   await installRepo()

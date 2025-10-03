@@ -112,10 +112,10 @@ function buildDeploymentComment(cfg) {
 
 export async function commentOnPR(cfg) {
   try {
-    const {isPr} = cfg
+    const {isPR} = cfg
     const commentBody = buildDeploymentComment(cfg)
 
-    if (isPr) {
+    if (isPR) {
       info(commentBody)
       return
     }
