@@ -1,7 +1,7 @@
 import {getInput, info} from '../lib/core.js'
 import {execLive} from '../lib/exec.js'
 import {parseGraphQLDeploymentOutput} from '../lib/utils.js'
-import {createGithubDeployment} from './create_github_deployment.js'
+import {createGithubDeployment} from './create-github-deployment.js'
 
 export async function deployGraphQL(bin, cfg = {}) {
   const enabled = getInput('graphql_deploy') === 'true'
