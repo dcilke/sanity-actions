@@ -28,8 +28,7 @@ function buildDeploymentComment(cfg) {
 
   comment += '\n\n'
 
-  comment += '#### Details\n'
-  comment += `**Deployment ID:** \`${deploymentId}\`\n`
+  comment += '**Details:**\n'
   if (didBuild) {
     comment += `**Studio output directory:** \`${studioDist}\`\n`
     if (studioDistSize) {
@@ -41,7 +40,6 @@ function buildDeploymentComment(cfg) {
     if (didStudioNoMinify) {
       comment += '**Studio minification:** Disabled\n'
     }
-    comment += '\n'
     if (schemaPath) {
       comment += `**Schema path:** \`${schemaPath}\`\n`
     }
@@ -51,10 +49,12 @@ function buildDeploymentComment(cfg) {
     if (schemaEnforceRequiredFields) {
       comment += `**Schema enforce required fields:** \`${schemaEnforceRequiredFields}\`\n`
     }
-    if (schemaRequired) {
-      comment += `**Schema build required:** \`${schemaRequired}\`\n`
+    if (!schemaRequired) {
+      comment += `**Schema build requried:** Disabled\n`
     }
   }
+
+  comment += `**Deployment ID:** \`${deploymentId}\`\n`
 
   comment += '\n\n---\n\n'
 
