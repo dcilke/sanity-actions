@@ -11,6 +11,8 @@ export async function buildStudio(bin) {
   const doSourceMaps = getInput('studio-source-maps') === 'true'
   const noMinify = getInput('studio-no-minify') === 'true'
 
+  info(`build input value: "${getInput('build')}" (enabled: ${enabled})`)
+
   if (!enabled) {
     info('Skipping Studio build')
     return {}

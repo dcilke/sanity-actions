@@ -38,7 +38,7 @@ jobs:
         uses: dcilke/sanity-actions/build-and-deploy@v1
         with:
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
-          deploy-graphql: true
+          graphql-deploy: true
 ```
 
 ## Configuration
@@ -73,8 +73,8 @@ jobs:
 ### Deployment controls
 | Input | Default | Description |
 |-------|---------|-------------|
-| `deploy-studio` | `"true"` | Run `sanity deploy`. |
-| `deploy-graphql` | `"false"` | Run `sanity graphql deploy`. |
+| `studio-deploy` | `"true"` | Run `sanity deploy`. |
+| `graphql-deploy` | `"false"` | Run `sanity graphql deploy`. |
 | `wait-for-deployment` | `"true"` | Poll the Studio URL until it responds. |
 | `deployment-timeout` | `"30"` | Seconds to wait for Studio availability. |
 
@@ -117,7 +117,7 @@ jobs:
     studio-no-minify: false
     schema-path: ./schema.json
     schema-required: true
-    deploy-graphql: true
+    graphql-deploy: true
     graphql-override-playground: true
     cache-dependencies: true
     upload-artifacts: true
@@ -153,7 +153,7 @@ When the action runs on `pull_request` events it:
 1. Detects the PR context and derives a deployment ID from `studioHost` and the source branch.
 2. Builds the studio (when `build: "true"`).
 3. Overrides `studioHost` during deploy so the preview is isolated from production.
-4. Deploys GraphQL with the same tag when `deploy-graphql: "true"`.
+4. Deploys GraphQL with the same tag when `graphql-deploy: "true"`.
 5. Optionally posts a PR comment and creates GitHub Deployment records.
 
 ### Requirements
@@ -185,7 +185,7 @@ jobs:
         uses: dcilke/sanity-actions/build-and-deploy@v1
         with:
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
-          deploy-graphql: true
+          graphql-deploy: true
           comment-on-pr: true
 ```
 

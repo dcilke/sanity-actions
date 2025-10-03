@@ -7,12 +7,12 @@ function buildDeploymentComment(cfg) {
   const didBuild = getInput('build') === 'true'
   const didStudioNoMinify = getInput('studio-no-minify') === 'true'
   const didStudioSourceMaps = getInput('studio-source-maps') === 'true'
-  const didStudioDeploy = getInput('deploy-studio') === 'true'
+  const didStudioDeploy = getInput('studio-deploy') === 'true'
   const schemaPath = getInput('schema-path')
   const schemaWorkspace = getInput('schema-workspace')
   const schemaEnforceRequiredFields = getInput('schema-enforce-required-fields')
   const schemaRequired = getInput('schema-required') === 'true'
-  const didGraphQLDeploy = getInput('deploy-graphql') === 'true'
+  const didGraphQLDeploy = getInput('graphql-deploy') === 'true'
 
   const {isPR, deploymentId, studioUrl, studioDist, studioDistSize, graphqlUrls} = cfg
   const dataset = getDataset()

@@ -4,7 +4,7 @@ import {parseGraphQLDeploymentOutput} from '../lib/utils.js'
 import {createGithubDeployment} from './create-github-deployment.js'
 
 export async function deployGraphQL(bin, cfg = {}) {
-  const enabled = getInput('deploy-graphql') === 'true'
+  const enabled = getInput('graphql-deploy') === 'true'
   const overrideTag = getInput('graphql-override-tag')
   const overrideDataset = getInput('graphql-override-dataset')
   const overridePlayground = getInput('graphql-override-playground')

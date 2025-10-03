@@ -4,9 +4,11 @@ import {overrideStudioHost, parseStudioDeploymentOutput} from '../lib/utils.js'
 import {createGithubDeployment} from './create-github-deployment.js'
 
 export async function deployStudio(bin, cfg = {}) {
-  const enabled = getInput('deploy-studio') === 'true'
+  const enabled = getInput('studio-deploy') === 'true'
   const outputPath = getInput('studio-output-path')
   const {isPR, deploymentId} = cfg
+
+  info(`deploy-studio input value: "${getInput('studio-deploy')}" (enabled: ${enabled})`)
 
   if (!enabled) {
     info('Skipping Studio deploy')

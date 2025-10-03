@@ -56,11 +56,11 @@ inputs:
     default: "true"
 
   # Deployment configuration
-  deploy-studio:
+  studio-deploy:
     description: "Deploy Sanity Studio"
     required: false
     default: "true"
-  deploy-graphql:
+  graphql-deploy:
     description: "Deploy GraphQL API"
     required: false
     default: "false"
@@ -227,8 +227,8 @@ runs:
         INPUT_SCHEMA_WORKSPACE: ${{ inputs.schema-workspace }}
         INPUT_SCHEMA_ENFORCE_REQUIRED_FIELDS: ${{ inputs.schema-enforce-required-fields }}
         INPUT_SCHEMA_REQUIRED: ${{ inputs.schema-required }}
-        INPUT_DEPLOY_STUDIO: ${{ inputs.deploy-studio }}
-        INPUT_DEPLOY_GRAPHQL: ${{ inputs.deploy-graphql }}
+        INPUT_DEPLOY_STUDIO: ${{ inputs.studio-deploy }}
+        INPUT_DEPLOY_GRAPHQL: ${{ inputs.graphql-deploy }}
         INPUT_GRAPHQL_OVERRIDE_TAG: ${{ inputs.graphql-override-tag }}
         INPUT_GRAPHQL_OVERRIDE_DATASET: ${{ inputs.graphql-override-dataset }}
         INPUT_GRAPHQL_OVERRIDE_PLAYGROUND: ${{ inputs.graphql-override-playground }}
