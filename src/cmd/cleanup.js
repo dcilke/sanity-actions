@@ -3,7 +3,7 @@
 import {setFailed} from '../lib/core.js'
 import {cleanGraphQL} from '../steps/clean-graphql.js'
 import {cleanStudio} from '../steps/clean-studio.js'
-import {getDeploymentConfig} from '../steps/get-deployment-config.js'
+import {getWorkflowConfig} from '../steps/get-workflow-config.js'
 import {installSanityCLI} from '../steps/install-sanity-cli.js'
 import {setEnvVars} from '../steps/set-env-vars.js'
 import {setPRStatus} from '../steps/set-pr-status.js'
@@ -14,7 +14,7 @@ export async function cleanup() {
   setEnvVars() // including auth token
   const bin = await installSanityCLI()
 
-  const config = getDeploymentConfig()
+  const config = getWorkflowConfig()
   await cleanStudio(bin, config)
   await cleanGraphQL(bin, config)
 
