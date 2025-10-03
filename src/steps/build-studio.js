@@ -45,7 +45,7 @@ export async function buildStudio(bin) {
       debug(`Dist size failed: ${err.message}`)
     }
 
-    info('✅ Build complete')
+    info('✅ Studio build complete')
     return {
       dist,
       distSize,

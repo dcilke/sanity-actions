@@ -16,8 +16,13 @@ export function setEnvVars() {
     const token = getInput('token')
     setEnv('SANITY_AUTH_TOKEN', token)
 
+    const githubToken = getInput('github_token')
+    if (githubToken) {
+      setEnv('GITHUB_TOKEN', githubToken)
+    }
+
     info('✅ Environment variables set')
   } catch (err) {
-    throw new Error(`Failed to set PR status`, {cause: err})
+    throw new Error(`Failed to set environment variables`, {cause: err})
   }
 }

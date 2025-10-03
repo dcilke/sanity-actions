@@ -29,7 +29,7 @@ export async function buildSchema(bin) {
 
     await execLive(bin, args)
 
-    info('✅ Build complete')
+    info('✅ Schema build complete')
   } catch (err) {
     if (required) {
       throw new Error(`Failed to build Studio`, {cause: err})
