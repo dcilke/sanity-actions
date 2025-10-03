@@ -227,8 +227,8 @@ runs:
         INPUT_SCHEMA_WORKSPACE: ${{ inputs.schema_workspace }}
         INPUT_SCHEMA_ENFORCE_REQUIRED_FIELDS: ${{ inputs.schema_enforce_required_fields }}
         INPUT_SCHEMA_REQUIRED: ${{ inputs.schema_required }}
-        INPUT_DEPLOY_STUDIO: ${{ inputs.studio_deploy }}
-        INPUT_DEPLOY_GRAPHQL: ${{ inputs.graphql_deploy }}
+        INPUT_STUDIO_DEPLOY: ${{ inputs.studio_deploy }}
+        INPUT_GRAPHQL_DEPLOY: ${{ inputs.graphql_deploy }}
         INPUT_GRAPHQL_OVERRIDE_TAG: ${{ inputs.graphql_override_tag }}
         INPUT_GRAPHQL_OVERRIDE_DATASET: ${{ inputs.graphql_override_dataset }}
         INPUT_GRAPHQL_OVERRIDE_PLAYGROUND: ${{ inputs.graphql_override_playground }}
