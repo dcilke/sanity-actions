@@ -8,7 +8,7 @@ export async function deployStudio(bin, cfg = {}) {
   const outputPath = getInput('studio-output-path')
   const {isPR, deploymentId} = cfg
 
-  info(`deploy-studio input value: "${getInput('studio-deploy')}" (enabled: ${enabled})`)
+  info(`studio-deploy input value: "${getInput('studio-deploy')}" (enabled: ${enabled})`)
 
   if (!enabled) {
     info('Skipping Studio deploy')
