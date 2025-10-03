@@ -88,11 +88,18 @@ export async function commentOnPR(cfg) {
     })
     /* eslint-enable camelcase */
 
+    info(`Found ${existingComments.length} existing comments`)
+
     const match = existingComments.find(
-      (comment) =>
-        comment.user?.login === 'github-actions[bot]' &&
-        comment.body?.includes('Sanity Build and Deploy'),
+      (comment) => {
+        const isBot = comment.user?.login === 'github-actions[bot]'
+        const hasText = comment.body?.includes('Sanity Build and Deploy')
+        info(`Comment by ${comment.user?.login}: isBot=${isBot}, hasText=${hasText}`)
+        return isBot && hasText
+      }
     )
+
+    info(`Match found: ${!!match}`)
 
     if (match) {
       /* eslint-disable camelcase */
