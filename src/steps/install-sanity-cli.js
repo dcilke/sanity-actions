@@ -22,7 +22,7 @@ function baseManifest() {
 }
 
 export async function installSanityCLI() {
-  const version = normalizeVersion(getInput('cli-version'))
+  const version = normalizeVersion(getInput('cli_version'))
   const manager = getPackageManager()
   const workDir = path.resolve(process.cwd(), '.sanity-cli')
 

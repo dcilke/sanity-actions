@@ -2,7 +2,7 @@ import {debug, getInput, info, setEnv} from '../lib/core.js'
 
 export function setEnvVars() {
   try {
-    const raw = getInput('environment-variables')
+    const raw = getInput('environment_variables')
     const variables = raw.split('\n').filter((line) => line.trim())
 
     for (const v of variables) {

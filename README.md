@@ -38,7 +38,7 @@ jobs:
         uses: dcilke/sanity-actions/build-and-deploy@v1
         with:
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
-          graphql-deploy: true
+          graphql_deploy: true
 ```
 
 ## Configuration
@@ -52,57 +52,57 @@ jobs:
 | Input | Default | Description |
 |-------|---------|-------------|
 | `path` | `.` | Location of the Sanity studio inside the repository. |
-| `cli-version` | `""` | Sanity CLI version to install (defaults to latest). |
+| `cli_version` | `""` | Sanity CLI version to install (defaults to latest). |
 
 ### Build configuration
 | Input | Default | Description |
 |-------|---------|-------------|
 | `build` | `"true"` | Run `sanity build` before deploying. |
-| `studio-output-path` | `""` | Directory name for build output (defaults to Sanity's `dist`). |
-| `studio-source-maps` | `"false"` | Include source maps when building. |
-| `studio-no-minify` | `"false"` | Skip frontend minification. |
+| `studio_output_path` | `""` | Directory name for build output (defaults to Sanity's `dist`). |
+| `studio_source_maps` | `"false"` | Include source maps when building. |
+| `studio_no_minify` | `"false"` | Skip frontend minification. |
 
 ### Schema extraction
 | Input | Default | Description |
 |-------|---------|-------------|
-| `schema-path` | `""` | Destination path for exported schema. |
-| `schema-workspace` | `""` | Workspace to generate (leave blank for all). |
-| `schema-enforce-required-fields` | `"false"` | Treat required schema fields as non-optional. |
-| `schema-required` | `"true"` | Fail the run when schema extraction errors. |
+| `schema_path` | `""` | Destination path for exported schema. |
+| `schema_workspace` | `""` | Workspace to generate (leave blank for all). |
+| `schema_enforce_required_fields` | `"false"` | Treat required schema fields as non-optional. |
+| `schema_required` | `"true"` | Fail the run when schema extraction errors. |
 
 ### Deployment controls
 | Input | Default | Description |
 |-------|---------|-------------|
-| `studio-deploy` | `"true"` | Run `sanity deploy`. |
-| `graphql-deploy` | `"false"` | Run `sanity graphql deploy`. |
+| `studio_deploy` | `"true"` | Run `sanity deploy`. |
+| `graphql_deploy` | `"false"` | Run `sanity graphql deploy`. |
 | `wait-for-deployment` | `"true"` | Poll the Studio URL until it responds. |
 | `deployment-timeout` | `"30"` | Seconds to wait for Studio availability. |
 
 ### GraphQL overrides
 | Input | Default | Description |
 |-------|---------|-------------|
-| `graphql-override-tag` | `""` | Explicit GraphQL tag (PR runs default to branch-based tag). |
-| `graphql-override-dataset` | `""` | Dataset to deploy instead of the default. |
-| `graphql-override-playground` | `""` | Force-enable (`true`) or disable (`false`) the GraphQL playground. |
-| `graphql-override-generation` | `""` | GraphQL generation to target. |
-| `graphql-override-non-null-document-fields` | `""` | Set to `true` to enable the flag. |
-| `graphql-override-with-union-cache` | `""` | Set to `true` to enable the experimental union cache. |
+| `graphql_override_tag` | `""` | Explicit GraphQL tag (PR runs default to branch-based tag). |
+| `graphql_override_dataset` | `""` | Dataset to deploy instead of the default. |
+| `graphql_override_playground` | `""` | Force-enable (`true`) or disable (`false`) the GraphQL playground. |
+| `graphql_override_generation` | `""` | GraphQL generation to target. |
+| `graphql_override_non_null_document_fields` | `""` | Set to `true` to enable the flag. |
+| `graphql_override_with_union_cache` | `""` | Set to `true` to enable the experimental union cache. |
 
 ### CI/CD helpers
 | Input | Default | Description |
 |-------|---------|-------------|
-| `cache-dependencies` | `"true"` | Cache dependencies using the detected package manager. |
-| `cache-sanity-cli` | `"false"` | Emit cache metadata so you can persist the `.sanity-cli` installation between jobs. |
-| `upload-artifacts` | `"false"` | Upload the build output with `actions/upload-artifact`. |
-| `artifact-name` | `"sanity-build"` | Artifact name when uploads are enabled. |
-| `comment-on-pr` | `"true"` | Post (or update) a PR comment after deployment. |
-| `create-github-deployment` | `"true"` | Create GitHub Deployment records for Studio/GraphQL URLs. |
+| `cache_dependencies` | `"true"` | Cache dependencies using the detected package manager. |
+| `cache_sanity_cli` | `"false"` | Emit cache metadata so you can persist the `.sanity-cli` installation between jobs. |
+| `upload_artifacts` | `"false"` | Upload the build output with `actions/upload-artifact`. |
+| `artifact_name` | `"sanity-build"` | Artifact name when uploads are enabled. |
+| `comment_on_pr` | `"true"` | Post (or update) a PR comment after deployment. |
+| `create_github_deployment` | `"true"` | Create GitHub Deployment records for Studio/GraphQL URLs. |
 
 ### Advanced
 | Input | Default | Description |
 |-------|---------|-------------|
-| `github-token` | `${{ github.token }}` | Token used for PR comments, statuses, and deployments. |
-| `environment-variables` | `""` | Newline separated `KEY=value` pairs exported before the build. |
+| `github_token` | `${{ github.token }}` | Token used for PR comments, statuses, and deployments. |
+| `environment_variables` | `""` | Newline separated `KEY=value` pairs exported before the build. |
 
 ### Usage example
 
@@ -112,40 +112,39 @@ jobs:
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
     path: ./studio
     build: true
-    studio-output-path: dist
-    studio-source-maps: true
-    studio-no-minify: false
-    schema-path: ./schema.json
-    schema-required: true
-    graphql-deploy: true
-    graphql-override-playground: true
-    cache-dependencies: true
-    upload-artifacts: true
-    artifact-name: studio-build
-    comment-on-pr: true
+    studio_output_path: dist
+    studio_source_maps: true
+    studio_no_minify: false
+    schema_path: ./schema.json
+    schema_required: true
+    graphql_deploy: true
+    graphql_override_playground: true
+    cache_dependencies: true
+    upload_artifacts: true
+    artifact_name: studio-build
+    comment_on_pr: true
 ```
 
 Boolean inputs expect the strings `"true"` or `"false"` to align with GitHub's composite action argument handling.
 
 ## Caching the Sanity CLI
-Set `cache-sanity-cli: true` to reuse the `.sanity-cli` directory between runs. The action restores the cache before reinstalling the CLI so repeat jobs skip downloads that your package manager already has in its store.
+Set `cache_sanity_cli: true` to reuse the `.sanity-cli` directory between runs. The action restores the cache before reinstalling the CLI so repeat jobs skip downloads that your package manager already has in its store.
 
 ```yaml
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   with:
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
-    cache-sanity-cli: true
+    cache_sanity_cli: true
 ```
 
-If you pin `cli-version`, update the value (or purge the cache) whenever you bump to a new major to avoid stale binaries.
+If you pin `cli_version`, update the value (or purge the cache) whenever you bump to a new major to avoid stale binaries.
 
 ## Outputs
-- `build-path` – Build directory reported by `sanity build`.
+- `build_path` – Build directory reported by `sanity build`.
 - `build-size` – Calculated size of the build output (if available).
-- `studio-url` – URL returned by `sanity deploy`.
-- `studio-deployment-id` – Deployment identifier returned by the CLI.
-- `graphql-urls` – Comma-separated GraphQL endpoints reported by `sanity graphql deploy`.
-- `deployment-id` – PR preview deployment ID (PR runs only).
+- `studio_url` – URL returned by `sanity deploy`.
+- `graphql_urls` – Comma-separated GraphQL endpoints reported by `sanity graphql deploy`.
+- `deployment_id` – PR preview deployment ID (PR runs only).
 - `is-pr-deployment` – `true` when the run is executing in a PR context.
 
 ## Pull Request Previews
@@ -153,7 +152,7 @@ When the action runs on `pull_request` events it:
 1. Detects the PR context and derives a deployment ID from `studioHost` and the source branch.
 2. Builds the studio (when `build: "true"`).
 3. Overrides `studioHost` during deploy so the preview is isolated from production.
-4. Deploys GraphQL with the same tag when `graphql-deploy: "true"`.
+4. Deploys GraphQL with the same tag when `graphql_deploy: "true"`.
 5. Optionally posts a PR comment and creates GitHub Deployment records.
 
 ### Requirements
@@ -185,8 +184,8 @@ jobs:
         uses: dcilke/sanity-actions/build-and-deploy@v1
         with:
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
-          graphql-deploy: true
-          comment-on-pr: true
+          graphql_deploy: true
+          comment_on_pr: true
 ```
 
 Pair this job with the cleanup action on `pull_request` `closed` events to automatically remove the matching GraphQL preview tag. Studio deploys expire on their own, so no additional teardown is required.
@@ -216,7 +215,7 @@ jobs:
         uses: dcilke/sanity-actions/cleanup@v1
         with:
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
-          comment-on-pr: true
+          comment_on_pr: true
 ```
 
 ## Requirements

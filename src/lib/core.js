@@ -22,7 +22,7 @@ export function setOutput(name, options) {
  * Get input value
  */
 export function getInput(name, options) {
-  return core.getInput(`inputs.${name}`, options)
+  return core.getInput(name, options)
 }
 
 export function setPackageManager(manager) {

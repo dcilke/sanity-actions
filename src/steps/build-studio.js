@@ -7,9 +7,9 @@ import {getDirectorySize} from '../lib/fs.js'
 
 export async function buildStudio(bin) {
   const enabled = getInput('build') === 'true'
-  const outputPath = getInput('studio-output-path')
-  const doSourceMaps = getInput('studio-source-maps') === 'true'
-  const noMinify = getInput('studio-no-minify') === 'true'
+  const outputPath = getInput('studio_output_path')
+  const doSourceMaps = getInput('studio_source_maps') === 'true'
+  const noMinify = getInput('studio_no_minify') === 'true'
 
   info(`build input value: "${getInput('build')}" (enabled: ${enabled})`)
 

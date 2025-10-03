@@ -1,16 +1,16 @@
 import {getInput, info} from '../lib/core.js'
 import {execLive} from '../lib/exec.js'
 import {parseGraphQLDeploymentOutput} from '../lib/utils.js'
-import {createGithubDeployment} from './create-github-deployment.js'
+import {createGithubDeployment} from './create_github_deployment.js'
 
 export async function deployGraphQL(bin, cfg = {}) {
-  const enabled = getInput('graphql-deploy') === 'true'
-  const overrideTag = getInput('graphql-override-tag')
-  const overrideDataset = getInput('graphql-override-dataset')
-  const overridePlayground = getInput('graphql-override-playground')
-  const overrideGeneration = getInput('graphql-override-generation')
-  const overrideWithUnionCache = getInput('graphql-override-with-union-cache')
-  const overrideNonNullDocumentFields = getInput('graphql-override-non-null-document-fields')
+  const enabled = getInput('graphql_deploy') === 'true'
+  const overrideTag = getInput('graphql_override_tag')
+  const overrideDataset = getInput('graphql_override_dataset')
+  const overridePlayground = getInput('graphql_override_playground')
+  const overrideGeneration = getInput('graphql_override_generation')
+  const overrideWithUnionCache = getInput('graphql_override_with_union_cache')
+  const overrideNonNullDocumentFields = getInput('graphql_override_non_null_document_fields')
 
   const {isPR, deploymentId} = cfg
 

@@ -16,7 +16,7 @@ inputs:
     description: "Path to Sanity studio"
     required: false
     default: "."
-  cli-version:
+  cli_version:
     description: "Version of Sanity CLI to install"
     required: false
     default: ""
@@ -26,128 +26,128 @@ inputs:
     description: "Build the project before deploying"
     required: false
     default: "true"
-  studio-output-path:
+  studio_output_path:
     description: "Studio build output directory"
     required: false
     default: ""
-  studio-source-maps:
+  studio_source_maps:
     description: "Include Studio source maps in build"
     required: false
     default: "false"
-  studio-no-minify:
+  studio_no_minify:
     description: "Skip Studio bundle minification"
     required: false
     default: "false"
-  schema-path:
+  schema_path:
     description: "Path to schema file"
     required: false
     default: ""
-  schema-workspace:
+  schema_workspace:
     description: "Name of workspace to generate (defaults to all workspaces)"
     required: false
     default: ""
-  schema-enforce-required-fields:
+  schema_enforce_required_fields:
     description: "Makes the schema generated treat fields marked as required as non-optional"
     required: false
     default: "false"
-  schema-required:
+  schema_required:
     description: "Fail if schema is unserializable"
     required: false
     default: "true"
 
   # Deployment configuration
-  studio-deploy:
+  studio_deploy:
     description: "Deploy Sanity Studio"
     required: false
     default: "true"
-  graphql-deploy:
+  graphql_deploy:
     description: "Deploy GraphQL API"
     required: false
     default: "false"
 
   # GraphQL configuration
-  graphql-override-tag:
+  graphql_override_tag:
     description: "Override GraphQL tag (PR deployments use branch name)"
     required: false
     default: ""
-  graphql-override-dataset:
+  graphql_override_dataset:
     description: "Override GraphQL dataset"
     required: false
     default: ""
-  graphql-override-playground:
+  graphql_override_playground:
     description: "Override GraphQL playground setting"
     required: false
     default: ""
-  graphql-override-generation:
+  graphql_override_generation:
     description: "Override GraphQL generation"
     required: false
     default: ""
-  graphql-override-non-null-document-fields:
+  graphql_override_non_null_document_fields:
     description: "Override non-null document fields setting"
     required: false
     default: ""
-  graphql-override-with-union-cache:
+  graphql_override_with_union_cache:
     description: "Experimental: Enable union cache"
     required: false
     default: ""
 
   # CI/CD features
-  cache-dependencies:
+  cache_dependencies:
     description: "Cache package manager dependencies"
     required: false
     default: "true"
-  cache-sanity-cli:
+  cache_sanity_cli:
     description: "Emit cache metadata for the local Sanity CLI install"
     required: false
     default: "false"
-  upload-artifacts:
+  upload_artifacts:
     description: "Upload build artifacts"
     required: false
     default: "false"
-  artifact-name:
+  artifact_name:
     description: "Name for uploaded artifacts"
     required: false
     default: "sanity-build"
-  comment-on-pr:
+  comment_on_pr:
     description: "Comment deployment details on PR"
     required: false
     default: "true"
-  create-github-deployment:
+  create_github_deployment:
     description: "Create GitHub deployment records"
     required: false
     default: "true"
 
   # Advanced options
-  github-token:
+  github_token:
     description: "GitHub token for PR comments and deployments"
     required: false
     default: ${{ github.token }}
-  environment-variables:
+  environment_variables:
     description: "Environment variables in KEY=value format"
     required: false
     default: ""
 
 outputs:
   # Build outputs
-  build-path:
+  build_path:
     description: "Path to built files"
     value: ${{ steps.build-and-deploy.outputs.dist }}
 
   # Studio outputs
-  studio-url:
+  studio_url:
     description: "Deployed Studio URL"
-    value: ${{ steps.build-and-deploy.outputs.studio-url }}
+    value: ${{ steps.build-and-deploy.outputs.studio_url }}
 
   # GraphQL outputs
-  graphql-urls:
+  graphql_urls:
     description: "GraphQL API endpoints"
-    value: ${{ steps.build-and-deploy.outputs.graphql-urls }}
+    value: ${{ steps.build-and-deploy.outputs.graphql_urls }}
 
   # PR deployment outputs
-  deployment-id:
+  deployment_id:
     description: "PR deployment ID (if in PR context)"
     value: ${{ steps.build-and-deploy.outputs.deployment_id }}
-  is-preview-deployment:
+  is_preview_deployment:
     description: "Whether this is a preview (PR) deployment"
     value: ${{ steps.build-and-deploy.outputs.is_pr }}
 
@@ -193,7 +193,7 @@ runs:
 
     # Cache dependencies
     - name: Cache dependencies
-      if: inputs.cache-dependencies == 'true'
+      if: inputs.cache_dependencies == 'true'
       uses: actions/cache@v4
       with:
         path: |
@@ -203,11 +203,11 @@ runs:
           ${{ runner.os }}-${{ steps.package-manager.outputs.manager }}-
 
     - name: Cache Sanity CLI
-      if: inputs.cache-sanity-cli == 'true' && inputs.cli-version != ''
+      if: inputs.cache_sanity_cli == 'true' && inputs.cli_version != ''
       uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/.sanity-cli
-        key: ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-${{ inputs.cli-version != '' && inputs.cli-version || 'latest' }}
+        key: ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-${{ inputs.cli_version != '' && inputs.cli_version || 'latest' }}
         restore-keys: |
           ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-
 
@@ -218,31 +218,31 @@ runs:
       env:
         INPUT_TOKEN: ${{ inputs.token }}
         INPUT_PATH: ${{ inputs.path }}
-        INPUT_CLI_VERSION: ${{ inputs.cli-version }}
+        INPUT_CLI_VERSION: ${{ inputs.cli_version }}
         INPUT_BUILD: ${{ inputs.build }}
-        INPUT_STUDIO_OUTPUT_PATH: ${{ inputs.studio-output-path }}
-        INPUT_STUDIO_SOURCE_MAPS: ${{ inputs.studio-source-maps }}
-        INPUT_STUDIO_NO_MINIFY: ${{ inputs.studio-no-minify }}
-        INPUT_SCHEMA_PATH: ${{ inputs.schema-path }}
-        INPUT_SCHEMA_WORKSPACE: ${{ inputs.schema-workspace }}
-        INPUT_SCHEMA_ENFORCE_REQUIRED_FIELDS: ${{ inputs.schema-enforce-required-fields }}
-        INPUT_SCHEMA_REQUIRED: ${{ inputs.schema-required }}
-        INPUT_DEPLOY_STUDIO: ${{ inputs.studio-deploy }}
-        INPUT_DEPLOY_GRAPHQL: ${{ inputs.graphql-deploy }}
-        INPUT_GRAPHQL_OVERRIDE_TAG: ${{ inputs.graphql-override-tag }}
-        INPUT_GRAPHQL_OVERRIDE_DATASET: ${{ inputs.graphql-override-dataset }}
-        INPUT_GRAPHQL_OVERRIDE_PLAYGROUND: ${{ inputs.graphql-override-playground }}
-        INPUT_GRAPHQL_OVERRIDE_GENERATION: ${{ inputs.graphql-override-generation }}
-        INPUT_GRAPHQL_OVERRIDE_NON_NULL_DOCUMENT_FIELDS: ${{ inputs.graphql-override-non-null-document-fields }}
-        INPUT_GRAPHQL_OVERRIDE_WITH_UNION_CACHE: ${{ inputs.graphql-override-with-union-cache }}
-        INPUT_CACHE_DEPENDENCIES: ${{ inputs.cache-dependencies }}
-        INPUT_CACHE_SANITY_CLI: ${{ inputs.cache-sanity-cli }}
-        INPUT_UPLOAD_ARTIFACTS: ${{ inputs.upload-artifacts }}
-        INPUT_ARTIFACT_NAME: ${{ inputs.artifact-name }}
-        INPUT_COMMENT_ON_PR: ${{ inputs.comment-on-pr }}
-        INPUT_CREATE_GITHUB_DEPLOYMENT: ${{ inputs.create-github-deployment }}
-        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
-        INPUT_ENVIRONMENT_VARIABLES: ${{ inputs.environment-variables }}
+        INPUT_STUDIO_OUTPUT_PATH: ${{ inputs.studio_output_path }}
+        INPUT_STUDIO_SOURCE_MAPS: ${{ inputs.studio_source_maps }}
+        INPUT_STUDIO_NO_MINIFY: ${{ inputs.studio_no_minify }}
+        INPUT_SCHEMA_PATH: ${{ inputs.schema_path }}
+        INPUT_SCHEMA_WORKSPACE: ${{ inputs.schema_workspace }}
+        INPUT_SCHEMA_ENFORCE_REQUIRED_FIELDS: ${{ inputs.schema_enforce_required_fields }}
+        INPUT_SCHEMA_REQUIRED: ${{ inputs.schema_required }}
+        INPUT_DEPLOY_STUDIO: ${{ inputs.studio_deploy }}
+        INPUT_DEPLOY_GRAPHQL: ${{ inputs.graphql_deploy }}
+        INPUT_GRAPHQL_OVERRIDE_TAG: ${{ inputs.graphql_override_tag }}
+        INPUT_GRAPHQL_OVERRIDE_DATASET: ${{ inputs.graphql_override_dataset }}
+        INPUT_GRAPHQL_OVERRIDE_PLAYGROUND: ${{ inputs.graphql_override_playground }}
+        INPUT_GRAPHQL_OVERRIDE_GENERATION: ${{ inputs.graphql_override_generation }}
+        INPUT_GRAPHQL_OVERRIDE_NON_NULL_DOCUMENT_FIELDS: ${{ inputs.graphql_override_non_null_document_fields }}
+        INPUT_GRAPHQL_OVERRIDE_WITH_UNION_CACHE: ${{ inputs.graphql_override_with_union_cache }}
+        INPUT_CACHE_DEPENDENCIES: ${{ inputs.cache_dependencies }}
+        INPUT_CACHE_SANITY_CLI: ${{ inputs.cache_sanity_cli }}
+        INPUT_UPLOAD_ARTIFACTS: ${{ inputs.upload_artifacts }}
+        INPUT_ARTIFACT_NAME: ${{ inputs.artifact_name }}
+        INPUT_COMMENT_ON_PR: ${{ inputs.comment_on_pr }}
+        INPUT_CREATE_GITHUB_DEPLOYMENT: ${{ inputs.create_github_deployment }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
+        INPUT_ENVIRONMENT_VARIABLES: ${{ inputs.environment_variables }}
       run: |
         cd ${{ inputs.path }}
         node ${{ github.action_path }}/../src/cmd/build-and-deploy.js
@@ -250,10 +250,10 @@ runs:
     # Upload artifacts
     - name: Upload build artifacts
       if: |
-        inputs.upload-artifacts == 'true' &&
+        inputs.upload_artifacts == 'true' &&
         inputs.build == 'true' &&
         steps.build-studio.outputs.path != ''
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.artifact-name }}
+        name: ${{ inputs.artifact_name }}
         path: ${{ steps.build-and-deploy.outputs.dist }}

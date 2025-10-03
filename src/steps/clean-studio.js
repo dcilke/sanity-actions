@@ -3,7 +3,7 @@ import {execLive} from '../lib/exec.js'
 import {overrideStudioHost, parseStudioDeploymentOutput} from '../lib/utils.js'
 
 export async function cleanStudio(bin, cfg = {}) {
-  const enabled = getInput('studio-cleanup') === 'true'
+  const enabled = getInput('studio_cleanup') === 'true'
   const {isPR, deploymentId} = cfg
 
   if (!enabled) {

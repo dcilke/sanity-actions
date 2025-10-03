@@ -2,9 +2,9 @@ import {getInput, info} from '../lib/core.js'
 import {execLive} from '../lib/exec.js'
 
 export async function cleanGraphQL(bin, cfg = {}) {
-  const enabled = getInput('graphql-deploy') === 'true'
-  const overrideTag = getInput('graphql-override-tag')
-  const overrideDataset = getInput('graphql-override-dataset')
+  const enabled = getInput('graphql_cleanup') === 'true'
+  const overrideTag = getInput('graphql_override_tag')
+  const overrideDataset = getInput('graphql_override_dataset')
 
   const {isPR, deploymentId} = cfg
 

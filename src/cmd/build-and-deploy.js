@@ -3,7 +3,7 @@
 import {debug, setFailed, setOutput} from '../lib/core.js'
 import {buildSchema} from '../steps/build-schema.js'
 import {buildStudio} from '../steps/build-studio.js'
-import {commentOnPR} from '../steps/comment-on-pr.js'
+import {commentOnPR} from '../steps/comment_on_pr.js'
 import {deployGraphQL} from '../steps/deploy-graphql.js'
 import {deployStudio} from '../steps/deploy-studio.js'
 import {getDeploymentConfig} from '../steps/get-deployment-config.js'
@@ -48,10 +48,10 @@ export async function buildAndDeploy() {
   })
   await setPRStatus('success', 'Sanity build and deploy successful!')
 
-  setOutput('build-path', studioBuild.dist)
-  setOutput('studio-url', studioDeploy.url)
-  setOutput('graphql-urls', graphqlDeploy.urls)
-  setOutput('deployment-id', config.deploymentId)
+  setOutput('build_path', studioBuild.dist)
+  setOutput('studio_url', studioDeploy.url)
+  setOutput('graphql_urls', graphqlDeploy.urls)
+  setOutput('deployment_id', config.deploymentId)
   setOutput('is-pr', config.isPR)
 }
 

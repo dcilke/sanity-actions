@@ -3,10 +3,10 @@ import {execLive} from '../lib/exec.js'
 
 export async function buildSchema(bin) {
   const enabled = getInput('build') === 'true'
-  const schemaPath = getInput('schema-path')
-  const workspace = getInput('schema-workspace')
-  const enforceRequiredFields = getInput('schema-enforce-required-fields') === 'true'
-  const required = getInput('schema-required') === 'true'
+  const schemaPath = getInput('schema_path')
+  const workspace = getInput('schema_workspace')
+  const enforceRequiredFields = getInput('schema_enforce_required_fields') === 'true'
+  const required = getInput('schema_required') === 'true'
 
   if (!enabled) {
     info('Skipping schema build')

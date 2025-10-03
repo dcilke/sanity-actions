@@ -1,14 +1,14 @@
 import {getInput, info} from '../lib/core.js'
 import {execLive} from '../lib/exec.js'
 import {overrideStudioHost, parseStudioDeploymentOutput} from '../lib/utils.js'
-import {createGithubDeployment} from './create-github-deployment.js'
+import {createGithubDeployment} from './create_github_deployment.js'
 
 export async function deployStudio(bin, cfg = {}) {
-  const enabled = getInput('studio-deploy') === 'true'
-  const outputPath = getInput('studio-output-path')
+  const enabled = getInput('studio_deploy') === 'true'
+  const outputPath = getInput('studio_output_path')
   const {isPR, deploymentId} = cfg
 
-  info(`studio-deploy input value: "${getInput('studio-deploy')}" (enabled: ${enabled})`)
+  info(`studio_deploy input value: "${getInput('studio_deploy')}" (enabled: ${enabled})`)
 
   if (!enabled) {
     info('Skipping Studio deploy')

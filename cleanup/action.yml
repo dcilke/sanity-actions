@@ -13,43 +13,43 @@ inputs:
     description: "Path to Sanity studio"
     required: false
     default: "."
-  cli-version:
+  cli_version:
     description: "Version of Sanity CLI to install"
     required: false
     default: ""
-  studio-cleanup:
+  studio_cleanup:
     description: "Run sanity studio cleanup for the environment"
     required: false
     default: "true"
-  graphql-cleanup:
+  graphql_cleanup:
     description: "Run sanity graphql undeploy for the environment"
     required: false
     default: "true"
-  graphql-override-tag:
+  graphql_override_tag:
     description: "Override GraphQL tag (PR deployments use branch name)"
     required: false
     default: ""
-  graphql-override-dataset:
+  graphql_override_dataset:
     description: "Override GraphQL dataset"
     required: false
     default: ""
 
   # CI/CD features
-  cache-sanity-cli:
+  cache_sanity_cli:
     description: "Emit cache metadata for the local Sanity CLI install"
     required: false
     default: "false"
-  comment-on-pr:
+  comment_on_pr:
     description: "Comment cleanup status on the pull request"
     required: false
     default: "true"
 
   # Advanced options
-  github-token:
+  github_token:
     description: "GitHub token for PR comments"
     required: false
     default: ${{ github.token }}
-  environment-variables:
+  environment_variables:
     description: "Environment variables in KEY=value format"
     required: false
     default: ""
@@ -95,11 +95,11 @@ runs:
         corepack enable
 
     - name: Cache Sanity CLI
-      if: inputs.cache-sanity-cli == 'true'
+      if: inputs.cache_sanity_cli == 'true'
       uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/.sanity-cli
-        key: ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-${{ inputs.cli-version != '' && inputs.cli-version || 'latest' }}
+        key: ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-${{ inputs.cli_version != '' && inputs.cli_version || 'latest' }}
         restore-keys: |
           ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-
 
@@ -109,15 +109,15 @@ runs:
       env:
         INPUT_TOKEN: ${{ inputs.token }}
         INPUT_PATH: ${{ inputs.path }}
-        INPUT_CLI_VERSION: ${{ inputs.cli-version }}
-        INPUT_STUDIO_CLEANUP: ${{ inputs.studio-cleanup }}
-        INPUT_GRAPHQL_CLEANUP: ${{ inputs.graphql-cleanup }}
-        INPUT_GRAPHQL_OVERRIDE_TAG: ${{ inputs.graphql-override-tag }}
-        INPUT_GRAPHQL_OVERRIDE_DATASET: ${{ inputs.graphql-override-dataset }}
-        INPUT_CACHE_SANITY_CLI: ${{ inputs.cache-sanity-cli }}
-        INPUT_COMMENT_ON_PR: ${{ inputs.comment-on-pr }}
-        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
-        INPUT_ENVIRONMENT_VARIABLES: ${{ inputs.environment-variables }}
+        INPUT_CLI_VERSION: ${{ inputs.cli_version }}
+        INPUT_STUDIO_CLEANUP: ${{ inputs.studio_cleanup }}
+        INPUT_GRAPHQL_CLEANUP: ${{ inputs.graphql_cleanup }}
+        INPUT_GRAPHQL_OVERRIDE_TAG: ${{ inputs.graphql_override_tag }}
+        INPUT_GRAPHQL_OVERRIDE_DATASET: ${{ inputs.graphql_override_dataset }}
+        INPUT_CACHE_SANITY_CLI: ${{ inputs.cache_sanity_cli }}
+        INPUT_COMMENT_ON_PR: ${{ inputs.comment_on_pr }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
+        INPUT_ENVIRONMENT_VARIABLES: ${{ inputs.environment_variables }}
       run: |
         cd ${{ inputs.path }}
         node ${{ github.action_path }}/../src/cmd/cleanup.js
