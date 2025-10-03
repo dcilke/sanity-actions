@@ -171,6 +171,8 @@ runs:
     - name: Detect package manager
       id: package-manager
       shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
       run: |
         cd ${{ inputs.path }}
         node ${{ github.action_path }}/../src/cmd/set-package-manager.js
@@ -213,6 +215,34 @@ runs:
     - name: Build and deploy
       id: build-and-deploy
       shell: bash
+      env:
+        INPUT_TOKEN: ${{ inputs.token }}
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_CLI_VERSION: ${{ inputs.cli-version }}
+        INPUT_BUILD: ${{ inputs.build }}
+        INPUT_STUDIO_OUTPUT_PATH: ${{ inputs.studio-output-path }}
+        INPUT_STUDIO_SOURCE_MAPS: ${{ inputs.studio-source-maps }}
+        INPUT_STUDIO_NO_MINIFY: ${{ inputs.studio-no-minify }}
+        INPUT_SCHEMA_PATH: ${{ inputs.schema-path }}
+        INPUT_SCHEMA_WORKSPACE: ${{ inputs.schema-workspace }}
+        INPUT_SCHEMA_ENFORCE_REQUIRED_FIELDS: ${{ inputs.schema-enforce-required-fields }}
+        INPUT_SCHEMA_REQUIRED: ${{ inputs.schema-required }}
+        INPUT_DEPLOY_STUDIO: ${{ inputs.deploy-studio }}
+        INPUT_DEPLOY_GRAPHQL: ${{ inputs.deploy-graphql }}
+        INPUT_GRAPHQL_OVERRIDE_TAG: ${{ inputs.graphql-override-tag }}
+        INPUT_GRAPHQL_OVERRIDE_DATASET: ${{ inputs.graphql-override-dataset }}
+        INPUT_GRAPHQL_OVERRIDE_PLAYGROUND: ${{ inputs.graphql-override-playground }}
+        INPUT_GRAPHQL_OVERRIDE_GENERATION: ${{ inputs.graphql-override-generation }}
+        INPUT_GRAPHQL_OVERRIDE_NON_NULL_DOCUMENT_FIELDS: ${{ inputs.graphql-override-non-null-document-fields }}
+        INPUT_GRAPHQL_OVERRIDE_WITH_UNION_CACHE: ${{ inputs.graphql-override-with-union-cache }}
+        INPUT_CACHE_DEPENDENCIES: ${{ inputs.cache-dependencies }}
+        INPUT_CACHE_SANITY_CLI: ${{ inputs.cache-sanity-cli }}
+        INPUT_UPLOAD_ARTIFACTS: ${{ inputs.upload-artifacts }}
+        INPUT_ARTIFACT_NAME: ${{ inputs.artifact-name }}
+        INPUT_COMMENT_ON_PR: ${{ inputs.comment-on-pr }}
+        INPUT_CREATE_GITHUB_DEPLOYMENT: ${{ inputs.create-github-deployment }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        INPUT_ENVIRONMENT_VARIABLES: ${{ inputs.environment-variables }}
       run: |
         cd ${{ inputs.path }}
         node ${{ github.action_path }}/../src/cmd/build-and-deploy.js
