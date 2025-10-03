@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 
 import {existsSync} from 'fs'
-import {homedir} from 'os'
 import path from 'path'
 
-import {debug, info, setFailed, setOutput, setPackageManager} from '../lib/core.js'
-import {execOutput} from '../lib/exec.js'
+import {info, setFailed, setOutput, setPackageManager} from '../lib/core.js'
 
 const LOCKFILE_PRIORITY = [
   {filename: 'pnpm-lock.yaml', manager: 'pnpm'},
@@ -22,28 +20,12 @@ async function whichPackageManager(options = {}) {
       const fullPath = path.join(filePath, entry.filename)
       if (existsSync(fullPath)) {
         manager = entry.manager
+        break // Use the first match (highest priority)
       }
     }
 
-    let cacheDir
-    switch (manager) {
-      case 'pnpm':
-        cacheDir = await execOutput('pnpm', ['store', 'path'])
-        break
-      case 'yarn':
-        cacheDir = await execOutput('yarn', ['cache', 'dir'])
-        break
-      case 'npm':
-        cacheDir = path.join(homedir(), '.npm')
-        break
-      default:
-      // do nothing
-    }
-
     info(`📦 Using ${manager}`)
-    debug(`📁 Cache directory: ${cacheDir}`)
     setOutput('manager', manager)
-    setOutput('cache-dir', cacheDir)
     setPackageManager(manager)
   } catch (err) {
     throw setFailed('Failed to detect package manager', err)

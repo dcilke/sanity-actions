@@ -195,7 +195,6 @@ runs:
       uses: actions/cache@v4
       with:
         path: |
-          ${{ steps.package-manager.outputs.cache-dir }}
           ${{ inputs.path }}/node_modules
         key: ${{ runner.os }}-${{ steps.package-manager.outputs.manager }}-${{ hashFiles(format('{0}/**/package-lock.json', inputs.path), format('{0}/**/yarn.lock', inputs.path), format('{0}/**/pnpm-lock.yaml', inputs.path)) }}
         restore-keys: |
