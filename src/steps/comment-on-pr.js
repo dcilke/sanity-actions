@@ -115,7 +115,7 @@ export async function commentOnPR(cfg) {
     const {isPR} = cfg
     const commentBody = buildDeploymentComment(cfg)
 
-    if (isPR) {
+    if (!isPR) {
       info(commentBody)
       return
     }

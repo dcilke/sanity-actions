@@ -18,7 +18,7 @@ export async function buildAndDeploy() {
   if (config.isPR) {
     await setPRStatus('pending', 'Sanity build and deploy in progress...')
   }
-  info(config)
+  info(JSON.stringify(config))
 
   setEnvVars() // including auth token
   await installRepo()
