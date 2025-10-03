@@ -28,7 +28,7 @@ export async function installSanityCLI() {
 
   try {
     await mkdir(workDir, {recursive: true})
-    await writeFile(workDir, baseManifest(), 'utf8')
+    await writeFile(path.join(workDir, 'package.json'), baseManifest(), 'utf8')
     let spec = '@sanity/cli'
     if (version !== 'latest') {
       spec += `@${version}`
