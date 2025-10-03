@@ -26,28 +26,16 @@ export async function exec(command, args = [], options = {}) {
 }
 
 /**
- * Execute command and return output
- */
-export async function execOutput(command, args = [], options = {}) {
-  const result = await exec(command, args, options)
-  return result.stdout.trim()
-}
-
-/**
- * Execute command with live output
+ * Execute command with live output AND capture stdout/stderr
  */
 export async function execLive(command, args = [], options = {}) {
-  try {
-    core.debug(`Executing (live): ${command} ${args.join(' ')}`)
-    const result = await execa(command, args, {
-      stdio: 'inherit',
-      ...options,
-    })
-    return result
-  } catch (error) {
-    core.error(`Command failed: ${command} ${args.join(' ')}`)
-    throw error
-  }
+  core.debug(`Executing (live+capture): ${command} ${args.join(' ')}`)
+  const result = await execa(command, args, {
+    all: true, // Combine stdout and stderr into 'all' property
+    ...options,
+  })
+
+  return result
 }
 
 /**

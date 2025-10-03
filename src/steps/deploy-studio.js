@@ -10,8 +10,6 @@ export async function deployStudio(bin, cfg = {}) {
   const buildEnabled = getInput('build') === 'true'
   const {isPR, deploymentId} = cfg
 
-  info(`studio_deploy input value: "${getInput('studio_deploy')}" (enabled: ${enabled})`)
-
   if (!enabled) {
     info('Skipping Studio deploy')
     return {}
@@ -37,8 +35,8 @@ export async function deployStudio(bin, cfg = {}) {
       overrideStudioHost(process.cwd(), deploymentId)
     }
 
-    const execOutput = await execLive(bin, args)
-    const {url} = parseStudioDeploymentOutput(execOutput)
+    const result = await execLive(bin, args)
+    const {url} = parseStudioDeploymentOutput(result.stdout)
 
     await createGithubDeployment('studio', cfg, url)
 

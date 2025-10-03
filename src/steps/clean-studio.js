@@ -1,6 +1,6 @@
 import {getInput, info} from '../lib/core.js'
 import {execLive} from '../lib/exec.js'
-import {overrideStudioHost, parseStudioDeploymentOutput} from '../lib/utils.js'
+import {overrideStudioHost} from '../lib/utils.js'
 
 export async function cleanStudio(bin, cfg = {}) {
   const enabled = getInput('studio_cleanup') === 'true'
@@ -8,7 +8,7 @@ export async function cleanStudio(bin, cfg = {}) {
 
   if (!enabled) {
     info('Skipping Studio cleanup')
-    return {}
+    return
   }
 
   try {
@@ -16,11 +16,9 @@ export async function cleanStudio(bin, cfg = {}) {
       overrideStudioHost('.', deploymentId)
     }
 
-    const execOutput = await execLive(bin, ['undeploy', '--yes'])
-    const {url} = parseStudioDeploymentOutput(execOutput)
+    await execLive(bin, ['undeploy', '--yes'])
 
     info('✅ Studio deployed')
-    return {url}
   } catch (err) {
     throw new Error(`Failed Studio cleanup`, {cause: err})
   }
