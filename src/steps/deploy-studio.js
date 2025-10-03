@@ -7,6 +7,7 @@ export async function deployStudio(bin, cfg = {}) {
   const enabled = getInput('studio_deploy') === 'true'
   const outputPath = getInput('studio_output_path')
   const schemaRequired = getInput('schema_required') === 'true'
+  const buildEnabled = getInput('build') === 'true'
   const {isPR, deploymentId} = cfg
 
   info(`studio_deploy input value: "${getInput('studio_deploy')}" (enabled: ${enabled})`)
@@ -17,7 +18,7 @@ export async function deployStudio(bin, cfg = {}) {
   }
 
   try {
-    const args = ['deploy', '--yes', '--no-build']
+    const args = ['deploy', '--yes']
 
     // Add build options
     if (outputPath !== '') {
@@ -26,6 +27,10 @@ export async function deployStudio(bin, cfg = {}) {
 
     if (schemaRequired) {
       args.push('--schema-required')
+    }
+
+    if (!buildEnabled) {
+      args.push('--no-build')
     }
 
     if (isPR && deploymentId) {
