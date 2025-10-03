@@ -3,7 +3,7 @@
 import {debug, setFailed, setOutput} from '../lib/core.js'
 import {buildSchema} from '../steps/build-schema.js'
 import {buildStudio} from '../steps/build-studio.js'
-import {commentOnPR} from '../steps/comment_on_pr.js'
+import {commentOnPR} from '../steps/comment-on-pr.js'
 import {deployGraphQL} from '../steps/deploy-graphql.js'
 import {deployStudio} from '../steps/deploy-studio.js'
 import {getDeploymentConfig} from '../steps/get-deployment-config.js'
