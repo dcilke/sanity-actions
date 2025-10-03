@@ -18,7 +18,6 @@ export async function buildAndDeploy() {
   if (config.isPR) {
     await setPRStatus('pending', 'Sanity build and deploy in progress...')
   }
-  info(JSON.stringify(config))
 
   setEnvVars() // including auth token
   await installRepo()
@@ -38,7 +37,7 @@ export async function buildAndDeploy() {
     deploymentId: config.deploymentId,
     studioUrl: studioDeploy.url,
     studioDist: studioBuild.dist,
-    studioDistSize: studioBuild.studioDistSize,
+    studioDistSize: studioBuild.distSize,
     graphqlUrls: graphqlDeploy.urls,
   })
   await setPRStatus('success', 'Sanity build and deploy successful!')
