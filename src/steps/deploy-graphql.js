@@ -57,8 +57,8 @@ export async function deployGraphQL(bin, cfg = {}) {
       args.push('--with-union-cache')
     }
 
-    const execOutput = await execLive(bin, args)
-    const parsed = parseGraphQLDeploymentOutput(execOutput)
+    const result = await execLive(bin, args)
+    const parsed = parseGraphQLDeploymentOutput(result.stdio)
     const urls = parsed.map((p) => p.url).join(',')
 
     await createGithubDeployment('graphql', cfg, urls)

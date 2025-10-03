@@ -10,7 +10,6 @@ import * as core from './core.js'
 export async function exec(command, args = [], options = {}) {
   core.debug(`Executing: ${command} ${args.join(' ')}`)
   const result = await execa(command, args, {
-    all: true,
     stdio: 'pipe',
     ...options,
   })
@@ -21,8 +20,8 @@ export async function exec(command, args = [], options = {}) {
  * Execute command with live output AND capture stdout/stderr
  */
 export async function execLive(command, args = [], options = {}) {
-  const result = exec(command, args, options)
-  core.info(result.all)
+  const result = await exec(command, args, options)
+  core.info(result.stdio)
   return result
 }
 
