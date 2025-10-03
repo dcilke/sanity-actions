@@ -23,6 +23,7 @@ export async function exec(command, args = [], options = {}) {
 export async function execLive(command, args = [], options = {}) {
   const result = exec(command, args, options)
   core.info(result.all)
+  return result
 }
 
 /**
