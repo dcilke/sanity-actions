@@ -36,7 +36,7 @@ export async function deployStudio(bin, cfg = {}) {
     }
 
     const result = await execLive(bin, args)
-    const {url} = parseStudioDeploymentOutput(result.stdio)
+    const {url} = parseStudioDeploymentOutput(result.stdout)
 
     await createGithubDeployment('studio', cfg, url)
 

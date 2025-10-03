@@ -21,7 +21,7 @@ export async function exec(command, args = [], options = {}) {
  */
 export async function execLive(command, args = [], options = {}) {
   const result = await exec(command, args, options)
-  core.info(result.stdio)
+  core.info(result.stdout)
   return result
 }
 
