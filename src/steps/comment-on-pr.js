@@ -58,12 +58,6 @@ function buildDeploymentComment(cfg) {
 
   comment += '\n\n---\n\n'
 
-  comment += '<details>\n<summary>ℹ️ <strong>About PR Preview Deployments</strong></summary>\n\n'
-  comment +=
-    'This is an isolated preview deployment for your pull request. It will not affect your production deployment.\n\n'
-  comment += '- **Auto-cleanup**: Runs when PR is closed\n'
-  comment += '\n</details>\n\n'
-
   comment += `<sub>🤖 Deployed by Sanity GitHub Actions at ${new Date().toLocaleString('en-US', {
     timeZone: 'UTC',
     dateStyle: 'short',
