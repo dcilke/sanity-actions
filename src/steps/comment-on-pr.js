@@ -91,7 +91,7 @@ export async function commentOnPR(cfg) {
     const match = existingComments.find(
       (comment) =>
         comment.user?.login === 'github-actions[bot]' &&
-        comment.body?.includes('Sanity Deployment Complete'),
+        comment.body?.includes('Sanity Build and Deploy'),
     )
 
     if (match) {
