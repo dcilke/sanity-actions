@@ -16,14 +16,6 @@ export function getInput(name, options) {
   return core.getInput(name, options)
 }
 
-export function setPackageManager(manager) {
-  return setEnv('SANITY_BAD_PACKAGE_MANAGER', manager)
-}
-
-export function getPackageManager() {
-  return getEnv('SANITY_BAD_PACKAGE_MANAGER') || 'npm'
-}
-
 export function setFailed(message, err) {
   core.setFailed(`❌ ${message}: ${err.message}`)
   return new Error(message, {cause: err})

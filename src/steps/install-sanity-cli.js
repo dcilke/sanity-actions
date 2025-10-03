@@ -1,7 +1,7 @@
 import {mkdir, writeFile} from 'fs/promises'
 import path from 'path'
 
-import {getInput, getPackageManager, info} from '../lib/core.js'
+import {getInput, info} from '../lib/core.js'
 import {execLive} from '../lib/exec.js'
 
 function normalizeVersion(version) {
@@ -23,7 +23,6 @@ function baseManifest() {
 
 export async function installSanityCLI() {
   const version = normalizeVersion(getInput('cli_version'))
-  const manager = getPackageManager()
   const workDir = path.resolve(process.cwd(), '.sanity-cli')
 
   try {
@@ -34,7 +33,7 @@ export async function installSanityCLI() {
       spec += `@${version}`
     }
 
-    await execLive(manager, ['install', spec], {cwd: workDir})
+    await execLive('npm', ['install', spec], {cwd: workDir})
     const bin = path.join(workDir, 'node_modules', '.bin', 'sanity')
 
     info(`📦 ${spec} installed at ${bin}`)

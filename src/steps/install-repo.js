@@ -1,10 +1,9 @@
-import {getPackageManager, info} from '../lib/core.js'
+import {info} from '../lib/core.js'
 import {execLive} from '../lib/exec.js'
 
 export async function installRepo() {
-  const manager = getPackageManager()
   try {
-    await execLive(manager, ['install'])
+    await execLive('npm', ['install'])
 
     info(`📦 Installed dependencies with ${manager}...`)
   } catch (err) {

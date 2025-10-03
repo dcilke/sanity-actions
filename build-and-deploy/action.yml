@@ -92,22 +92,10 @@ inputs:
     default: ""
 
   # CI/CD features
-  cache_dependencies:
-    description: "Cache package manager dependencies"
-    required: false
-    default: "true"
-  cache_sanity_cli:
-    description: "Emit cache metadata for the local Sanity CLI install"
+  cache_cli:
+    description: "Cache Sanity CLI. Requires cli_version to be set."
     required: false
     default: "false"
-  upload_artifacts:
-    description: "Upload build artifacts"
-    required: false
-    default: "false"
-  artifact_name:
-    description: "Name for uploaded artifacts"
-    required: false
-    default: "sanity-build"
   comment_on_pr:
     description: "Comment deployment details on PR"
     required: false
@@ -132,13 +120,9 @@ outputs:
   build_path:
     description: "Path to built files"
     value: ${{ steps.build-and-deploy.outputs.dist }}
-
-  # Studio outputs
   studio_url:
     description: "Deployed Studio URL"
     value: ${{ steps.build-and-deploy.outputs.studio_url }}
-
-  # GraphQL outputs
   graphql_urls:
     description: "GraphQL API endpoints"
     value: ${{ steps.build-and-deploy.outputs.graphql_urls }}
@@ -154,62 +138,20 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # Setup Node.js
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: "lts/*"
-
-    # Install action dependencies
     - name: Install action dependencies
       shell: bash
       run: |
         cd ${{ github.action_path }}/..
         npm install --production --no-save
 
-    # Detect package manager
-    - name: Detect package manager
-      id: package-manager
-      shell: bash
-      env:
-        INPUT_PATH: ${{ inputs.path }}
-      run: |
-        cd ${{ inputs.path }}
-        node ${{ github.action_path }}/../src/cmd/set-package-manager.js
-
-    # Setup package manager
-    - name: Setup pnpm
-      if: steps.package-manager.outputs.manager == 'pnpm'
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-
-    - name: Setup Corepack
-      if: steps.package-manager.outputs.manager == 'yarn'
-      shell: bash
-      run: |
-        cd ${{ inputs.path }}
-        corepack enable
-
-    # Cache dependencies
-    - name: Cache dependencies
-      if: inputs.cache_dependencies == 'true'
-      uses: actions/cache@v4
-      with:
-        path: |
-          ${{ inputs.path }}/node_modules
-        key: ${{ runner.os }}-${{ steps.package-manager.outputs.manager }}-${{ hashFiles(format('{0}/**/package-lock.json', inputs.path), format('{0}/**/yarn.lock', inputs.path), format('{0}/**/pnpm-lock.yaml', inputs.path)) }}
-        restore-keys: |
-          ${{ runner.os }}-${{ steps.package-manager.outputs.manager }}-
-
     - name: Cache Sanity CLI
-      if: inputs.cache_sanity_cli == 'true' && inputs.cli_version != ''
+      if: inputs.cache_cli == 'true' && inputs.cli_version != ''
       uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/.sanity-cli
-        key: ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-${{ inputs.cli_version != '' && inputs.cli_version || 'latest' }}
+        key: ${{ runner.os }}-sanity-cli-npm-${{ inputs.cli_version }}
         restore-keys: |
-          ${{ runner.os }}-sanity-cli-${{ steps.package-manager.outputs.manager }}-
+          ${{ runner.os }}-sanity-cli-npm-
 
     # Build and deploy
     - name: Build and deploy
@@ -235,8 +177,6 @@ runs:
         INPUT_GRAPHQL_OVERRIDE_GENERATION: ${{ inputs.graphql_override_generation }}
         INPUT_GRAPHQL_OVERRIDE_NON_NULL_DOCUMENT_FIELDS: ${{ inputs.graphql_override_non_null_document_fields }}
         INPUT_GRAPHQL_OVERRIDE_WITH_UNION_CACHE: ${{ inputs.graphql_override_with_union_cache }}
-        INPUT_CACHE_DEPENDENCIES: ${{ inputs.cache_dependencies }}
-        INPUT_CACHE_SANITY_CLI: ${{ inputs.cache_sanity_cli }}
         INPUT_UPLOAD_ARTIFACTS: ${{ inputs.upload_artifacts }}
         INPUT_ARTIFACT_NAME: ${{ inputs.artifact_name }}
         INPUT_COMMENT_ON_PR: ${{ inputs.comment_on_pr }}

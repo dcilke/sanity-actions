@@ -50,9 +50,9 @@ export async function execLive(command, args = [], options = {}) {
     }
   })
 
-  endGroup(cmdArgs)
-
   const result = await subprocess
+
+  endGroup(cmdArgs)
   return result
 }
 

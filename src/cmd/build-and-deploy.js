@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
-import {info, setFailed, setOutput} from '../lib/core.js'
+import {setFailed, setOutput} from '../lib/core.js'
 import {buildSchema} from '../steps/build-schema.js'
 import {buildStudio} from '../steps/build-studio.js'
 import {commentOnPR} from '../steps/comment-on-pr.js'
 import {deployGraphQL} from '../steps/deploy-graphql.js'
 import {deployStudio} from '../steps/deploy-studio.js'
 import {getWorkflowConfig} from '../steps/get-workflow-config.js'
-import {installRepo} from '../steps/install-repo.js'
 import {installSanityCLI} from '../steps/install-sanity-cli.js'
 import {setEnvVars} from '../steps/set-env-vars.js'
 import {setPRStatus} from '../steps/set-pr-status.js'
@@ -20,7 +19,6 @@ export async function buildAndDeploy() {
   }
 
   setEnvVars() // including auth token
-  await installRepo()
   const bin = await installSanityCLI()
 
   // Build

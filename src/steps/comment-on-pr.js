@@ -69,7 +69,6 @@ function buildDeploymentComment(cfg) {
 
 export async function commentOnPR(cfg) {
   try {
-    info('🔍 commentOnPR() called')
     const {isPR} = cfg
     if (!isPR) {
       return
@@ -80,9 +79,6 @@ export async function commentOnPR(cfg) {
     const prNumber = getPullRequestNumber()
     const octokit = getOctokitClient()
 
-    info('call list comments')
-    console.log('call list comments')
-
     /* eslint-disable camelcase */
     const existingComments = await octokit.paginate(octokit.rest.issues.listComments, {
       owner,
@@ -92,21 +88,11 @@ export async function commentOnPR(cfg) {
     })
     /* eslint-enable camelcase */
 
-    info(`PR_NUMBER: ${prNumber}`)
-    console.log(`PR_NUMBER: ${prNumber}`)
-    info(`# Comments: ${existingComments.length}`)
-    console.log(`# Comments: ${existingComments.length}`)
-
-    const match = existingComments.find((comment) => {
-      const isBot = comment.user?.login === 'github-actions[bot]'
-      const hasText = comment.body?.includes('Sanity Build and Deploy')
-      info(`Comment by ${comment.user?.login}: isBot=${isBot}, hasText=${hasText}`)
-      console.log(`Comment by ${comment.user?.login}: isBot=${isBot}, hasText=${hasText}`)
-      return isBot && hasText
-    })
-
-    info(`Match found: ${!!match}`)
-    console.log(`Match found: ${!!match}`)
+    const match = existingComments.find(
+      (comment) =>
+        comment.user?.login === 'github-actions[bot]' &&
+        comment.body?.includes('Sanity Build and Deploy'),
+    )
 
     if (match) {
       /* eslint-disable camelcase */
