@@ -1,9 +1,8 @@
-import {endGroup} from '@actions/core'
 import {execa} from 'execa'
 import fs from 'fs'
 import path from 'path'
 
-import {debug, startGroup} from './core'
+import {debug, endGroup, startGroup} from './core.js'
 
 /**
  * Execute command with options
