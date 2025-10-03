@@ -2,7 +2,7 @@ import {execa} from 'execa'
 import fs from 'fs'
 import path from 'path'
 
-import {debug, endGroup, startGroup} from './core.js'
+import {debug, endGroup, info, startGroup} from './core.js'
 
 /**
  * Execute command with options
@@ -34,7 +34,7 @@ export async function execLive(command, args = [], options = {}) {
     const lines = data.toString().split('\n')
     for (const line of lines) {
       if (line.trim()) {
-        console.log(`\x1b[90m${line}\x1b[0m`)
+        info(`\x1b[90m${line}\x1b[0m`)
       }
     }
   })
@@ -45,7 +45,7 @@ export async function execLive(command, args = [], options = {}) {
     for (const line of lines) {
       if (line.trim()) {
         // \x1b[91m is bright red color, \x1b[0m resets
-        console.error(`\x1b[91m${line}\x1b[0m`)
+        info(`\x1b[91m${line}\x1b[0m`)
       }
     }
   })
