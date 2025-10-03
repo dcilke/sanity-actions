@@ -80,21 +80,6 @@ export function getStudioHost(path = '.') {
   )
 }
 
-export function getDataset(path = '.') {
-  const configPath = findCLIConfig(path)
-
-  if (configPath) {
-    const host = extractDatasetFromConfig(configPath)
-    if (host) {
-      return host
-    }
-  }
-
-  throw new Error(
-    'Could not find dataset in Sanity configuration. Please ensure dataset is defined in your Sanity cli config.',
-  )
-}
-
 /**
  * Overrides the studioHost in the cli config and unsets the appId to enable branch deployments
  */

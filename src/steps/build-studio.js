@@ -1,7 +1,4 @@
-import path from 'path'
-import {debug} from 'util'
-
-import {getInput, info} from '../lib/core.js'
+import {getInput, info, warning} from '../lib/core.js'
 import {execLive} from '../lib/exec.js'
 import {getDirectorySize} from '../lib/fs.js'
 
@@ -33,16 +30,13 @@ export async function buildStudio(bin) {
     args.push('--yes')
     await execLive(bin, args)
 
-    let dist = path.join('.', 'dist')
+    const dist = outputPath === '' ? './dist' : outputPath
     let distSize
 
     try {
-      if (outputPath !== '') {
-        dist = outputPath
-      }
       distSize = await getDirectorySize(dist)
     } catch (err) {
-      debug(`Dist size failed: ${err.message}`)
+      warning(`Dist size failed: ${err.message}`)
     }
 
     info('✅ Studio build complete')
