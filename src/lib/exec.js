@@ -20,8 +20,34 @@ export async function exec(command, args = [], options = {}) {
  * Execute command with live output AND capture stdout/stderr
  */
 export async function execLive(command, args = [], options = {}) {
-  const result = await exec(command, args, options)
-  core.info(result.stdout)
+  core.debug(`Executing (live+capture): ${command} ${args.join(' ')}`)
+
+  const subprocess = execa(command, args, {
+    ...options,
+  })
+
+  // Stream stdout in gray color
+  subprocess.stdout?.on('data', (data) => {
+    const lines = data.toString().split('\n')
+    for (const line of lines) {
+      if (line.trim()) {
+        console.log(`\x1b[90m${line}\x1b[0m`)
+      }
+    }
+  })
+
+  // Stream stderr in red color
+  subprocess.stderr?.on('data', (data) => {
+    const lines = data.toString().split('\n')
+    for (const line of lines) {
+      if (line.trim()) {
+        // \x1b[91m is bright red color, \x1b[0m resets
+        console.error(`\x1b[91m${line}\x1b[0m`)
+      }
+    }
+  })
+
+  const result = await subprocess
   return result
 }
 

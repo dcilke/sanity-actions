@@ -16,7 +16,9 @@ export async function deployGraphQL(bin, cfg = {}) {
 
   if (!enabled) {
     info('Skipping GraphQL deploy')
-    return {}
+    return {
+      urls: [],
+    }
   }
 
   try {

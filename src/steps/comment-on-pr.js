@@ -112,7 +112,13 @@ function buildDeploymentComment(cfg) {
 
 export async function commentOnPR(cfg) {
   try {
+    const {isPr} = cfg
     const commentBody = buildDeploymentComment(cfg)
+
+    if (isPr) {
+      info(commentBody)
+      return
+    }
 
     const {owner, repo} = getRepoDetails()
     const prNumber = getPullRequestNumber()
@@ -155,6 +161,6 @@ export async function commentOnPR(cfg) {
       info('✅ Created new PR comment')
     }
   } catch (error) {
-    warning(`Failed to create PR comment: ${error.message}`)
+    warning(`⚠️ Failed to create PR comment: ${error.message}`)
   }
 }
