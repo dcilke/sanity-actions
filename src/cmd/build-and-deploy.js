@@ -6,7 +6,7 @@ import {buildStudio} from '../steps/build-studio.js'
 import {commentOnPR} from '../steps/comment-on-pr.js'
 import {deployGraphQL} from '../steps/deploy-graphql.js'
 import {deployStudio} from '../steps/deploy-studio.js'
-import {getDeploymentConfig} from '../steps/get-deployment-config.js'
+import {getWorkflowConfig} from '../steps/get-workflow-config.js'
 import {installRepo} from '../steps/install-repo.js'
 import {installSanityCLI} from '../steps/install-sanity-cli.js'
 import {setEnvVars} from '../steps/set-env-vars.js'
@@ -14,7 +14,11 @@ import {setPRStatus} from '../steps/set-pr-status.js'
 
 export async function buildAndDeploy() {
   // Setup
-  await setPRStatus('pending', 'Sanity build and deploy in progress...')
+  const config = getWorkflowConfig()
+  if (config.isPR) {
+    await setPRStatus('pending', 'Sanity build and deploy in progress...')
+  }
+  info(config)
 
   setEnvVars() // including auth token
   await installRepo()
@@ -25,7 +29,6 @@ export async function buildAndDeploy() {
   await buildSchema(bin)
 
   // Deploy
-  const config = getDeploymentConfig()
   const studioDeploy = await deployStudio(bin, config)
   const graphqlDeploy = await deployGraphQL(bin, config)
 

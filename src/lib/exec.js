@@ -1,14 +1,15 @@
+import {endGroup} from '@actions/core'
 import {execa} from 'execa'
 import fs from 'fs'
 import path from 'path'
 
-import * as core from './core.js'
+import {debug, startGroup} from './core'
 
 /**
  * Execute command with options
  */
 export async function exec(command, args = [], options = {}) {
-  core.debug(`Executing: ${command} ${args.join(' ')}`)
+  debug(`Executing: ${command} ${args.join(' ')}`)
   const result = await execa(command, args, {
     stdio: 'pipe',
     ...options,
@@ -20,7 +21,10 @@ export async function exec(command, args = [], options = {}) {
  * Execute command with live output AND capture stdout/stderr
  */
 export async function execLive(command, args = [], options = {}) {
-  core.debug(`Executing (live+capture): ${command} ${args.join(' ')}`)
+  const cmdArgs = `${command} ${args.join(' ')}`
+  debug(`Executing (live+capture): ${cmdArgs}`)
+
+  startGroup(cmdArgs)
 
   const subprocess = execa(command, args, {
     ...options,
@@ -46,6 +50,8 @@ export async function execLive(command, args = [], options = {}) {
       }
     }
   })
+
+  endGroup(cmdArgs)
 
   const result = await subprocess
   return result
