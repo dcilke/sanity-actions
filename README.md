@@ -75,8 +75,6 @@ jobs:
 |-------|---------|-------------|
 | `studio_deploy` | `"true"` | Run `sanity deploy`. |
 | `graphql_deploy` | `"false"` | Run `sanity graphql deploy`. |
-| `wait-for-deployment` | `"true"` | Poll the Studio URL until it responds. |
-| `deployment-timeout` | `"30"` | Seconds to wait for Studio availability. |
 
 ### GraphQL overrides
 | Input | Default | Description |
@@ -91,17 +89,14 @@ jobs:
 ### CI/CD helpers
 | Input | Default | Description |
 |-------|---------|-------------|
-| `cache_dependencies` | `"true"` | Cache dependencies using the detected package manager. |
-| `cache_sanity_cli` | `"false"` | Emit cache metadata so you can persist the `.sanity-cli` installation between jobs. |
-| `upload_artifacts` | `"false"` | Upload the build output with `actions/upload-artifact`. |
-| `artifact_name` | `"sanity-build"` | Artifact name when uploads are enabled. |
+| `cache_cli` | `"false"` | Cache Sanity CLI. Requires cli_version to be set. |
 | `comment_on_pr` | `"true"` | Post (or update) a PR comment after deployment. |
 | `create_github_deployment` | `"true"` | Create GitHub Deployment records for Studio/GraphQL URLs. |
 
 ### Advanced
 | Input | Default | Description |
 |-------|---------|-------------|
-| `github_token` | `${{ github.token }}` | Token used for PR comments, statuses, and deployments. |
+| `github_token` | `""` | Token used for PR comments and deployments (defaults to automatic token). |
 | `environment_variables` | `""` | Newline separated `KEY=value` pairs exported before the build. |
 
 ### Usage example
@@ -119,33 +114,32 @@ jobs:
     schema_required: true
     graphql_deploy: true
     graphql_override_playground: true
-    cache_dependencies: true
-    upload_artifacts: true
-    artifact_name: studio-build
+    cache_cli: true
+    cli_version: "3.x"
     comment_on_pr: true
 ```
 
 Boolean inputs expect the strings `"true"` or `"false"` to align with GitHub's composite action argument handling.
 
 ## Caching the Sanity CLI
-Set `cache_sanity_cli: true` to reuse the `.sanity-cli` directory between runs. The action restores the cache before reinstalling the CLI so repeat jobs skip downloads that your package manager already has in its store.
+Set `cache_cli: true` to reuse the `.sanity-cli` directory between runs. The action restores the cache before reinstalling the CLI so repeat jobs skip downloads that your package manager already has in its store.
 
 ```yaml
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   with:
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
-    cache_sanity_cli: true
+    cache_cli: true
+    cli_version: "3.x"
 ```
 
-If you pin `cli_version`, update the value (or purge the cache) whenever you bump to a new major to avoid stale binaries.
+Note: `cache_cli` requires `cli_version` to be set. Update the version value (or purge the cache) whenever you bump to a new major to avoid stale binaries.
 
 ## Outputs
 - `build_path` – Build directory reported by `sanity build`.
-- `build-size` – Calculated size of the build output (if available).
 - `studio_url` – URL returned by `sanity deploy`.
 - `graphql_urls` – Comma-separated GraphQL endpoints reported by `sanity graphql deploy`.
 - `deployment_id` – PR preview deployment ID (PR runs only).
-- `is-pr-deployment` – `true` when the run is executing in a PR context.
+- `is_preview_deployment` – `true` when the run is executing in a PR context.
 
 ## Pull Request Previews
 When the action runs on `pull_request` events it:
@@ -217,6 +211,22 @@ jobs:
           token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
           comment_on_pr: true
 ```
+
+### Cleanup Configuration
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `token` | | Sanity auth token for cleanup (required). |
+| `path` | `"."` | Path to Sanity studio. |
+| `cli_version` | `""` | Version of Sanity CLI to install. |
+| `studio_cleanup` | `"true"` | Run sanity studio cleanup for the environment. |
+| `graphql_cleanup` | `"true"` | Run sanity graphql undeploy for the environment. |
+| `graphql_override_tag` | `""` | Override GraphQL tag (PR deployments use branch name). |
+| `graphql_override_dataset` | `""` | Override GraphQL dataset. |
+| `cache_cli` | `"false"` | Cache Sanity CLI (requires cli_version). |
+| `comment_on_pr` | `"true"` | Comment cleanup status on the pull request. |
+| `github_token` | `""` | GitHub token for PR comments (defaults to automatic token). |
+| `environment_variables` | `""` | Environment variables in KEY=value format. |
 
 ## Requirements
 - GitHub-hosted runner (`ubuntu-latest`, `macos-latest`, or `windows-latest`).
