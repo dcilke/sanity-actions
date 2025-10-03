@@ -177,8 +177,6 @@ runs:
         INPUT_GRAPHQL_OVERRIDE_GENERATION: ${{ inputs.graphql_override_generation }}
         INPUT_GRAPHQL_OVERRIDE_NON_NULL_DOCUMENT_FIELDS: ${{ inputs.graphql_override_non_null_document_fields }}
         INPUT_GRAPHQL_OVERRIDE_WITH_UNION_CACHE: ${{ inputs.graphql_override_with_union_cache }}
-        INPUT_UPLOAD_ARTIFACTS: ${{ inputs.upload_artifacts }}
-        INPUT_ARTIFACT_NAME: ${{ inputs.artifact_name }}
         INPUT_COMMENT_ON_PR: ${{ inputs.comment_on_pr }}
         INPUT_CREATE_GITHUB_DEPLOYMENT: ${{ inputs.create_github_deployment }}
         INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -186,14 +184,3 @@ runs:
       run: |
         cd ${{ inputs.path }}
         node ${{ github.action_path }}/../src/cmd/build-and-deploy.js
-
-    # Upload artifacts
-    - name: Upload build artifacts
-      if: |
-        inputs.upload_artifacts == 'true' &&
-        inputs.build == 'true' &&
-        steps.build-studio.outputs.path != ''
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ inputs.artifact_name }}
-        path: ${{ steps.build-and-deploy.outputs.dist }}
