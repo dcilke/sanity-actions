@@ -14,9 +14,7 @@ import {setPRStatus} from '../steps/set-pr-status.js'
 export async function buildAndDeploy() {
   // Setup
   const config = getWorkflowConfig()
-  if (config.isPR) {
-    await setPRStatus('pending', 'Sanity build and deploy in progress...')
-  }
+  if (config.isPR) await setPRStatus('pending', 'Sanity build and deploy in progress...')
 
   setEnvVars() // including auth token
   const bin = await installSanityCLI()
@@ -38,7 +36,7 @@ export async function buildAndDeploy() {
     studioDistSize: studioBuild.distSize,
     graphqlUrls: graphqlDeploy.urls,
   })
-  await setPRStatus('success', 'Sanity build and deploy successful!')
+  if (config.isPR) await setPRStatus('success', 'Sanity build and deploy successful!')
 
   setOutput('build_path', studioBuild.dist)
   setOutput('studio_url', studioDeploy.url)

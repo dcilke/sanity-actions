@@ -10,15 +10,16 @@ import {setPRStatus} from '../steps/set-pr-status.js'
 
 export async function cleanup() {
   // Setup
-  await setPRStatus('pending', 'Sanity cleanup in progress...')
+  const config = getWorkflowConfig()
+  if (config.isPR) await setPRStatus('pending', 'Sanity cleanup in progress...')
+
   setEnvVars() // including auth token
   const bin = await installSanityCLI()
 
-  const config = getWorkflowConfig()
   await cleanStudio(bin, config)
   await cleanGraphQL(bin, config)
 
-  await setPRStatus('success', 'Sanity cleanup successful!')
+  if (config.isPR) await setPRStatus('success', 'Sanity cleanup successful!')
 }
 
 // CLI entry point
