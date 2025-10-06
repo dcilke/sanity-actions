@@ -18,7 +18,7 @@ export async function cleanStudio(bin, cfg = {}) {
 
     await execLive(bin, ['undeploy', '--yes'])
 
-    info('✅ Studio deployed')
+    info('✅ Studio cleanup')
   } catch (err) {
     throw new Error(`Failed Studio cleanup`, {cause: err})
   }

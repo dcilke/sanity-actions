@@ -35,7 +35,7 @@ export async function cleanGraphQL(bin, cfg = {}) {
 
     await execLive(bin, args)
 
-    info('✅ GraphQL undeployed')
+    info('✅ GraphQL cleanup')
   } catch (err) {
     throw new Error(`Failed GraphQL cleanup`, {cause: err})
   }
