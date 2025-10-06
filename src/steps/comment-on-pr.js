@@ -6,9 +6,6 @@ function buildDeploymentComment(cfg) {
   const didStudioNoMinify = getInput('studio_no_minify') === 'true'
   const didStudioSourceMaps = getInput('studio_source_maps') === 'true'
   const didStudioDeploy = getInput('studio_deploy') === 'true'
-  const schemaPath = getInput('schema_path')
-  const schemaWorkspace = getInput('schema_workspace')
-  const schemaEnforceRequiredFields = getInput('schema_enforce_required_fields') === 'true'
   const schemaRequired = getInput('schema_required') === 'true'
   const didGraphQLDeploy = getInput('graphql_deploy') === 'true'
 
@@ -39,15 +36,6 @@ function buildDeploymentComment(cfg) {
     }
     if (didStudioNoMinify) {
       comment += '**Studio minification:** Disabled\n'
-    }
-    if (schemaPath) {
-      comment += `**Schema path:** \`${schemaPath}\`\n`
-    }
-    if (schemaWorkspace) {
-      comment += `**Schema workspace:** \`${schemaWorkspace}\`\n`
-    }
-    if (schemaEnforceRequiredFields) {
-      comment += `**Schema enforce required fields:** \`${schemaEnforceRequiredFields}\`\n`
     }
     if (!schemaRequired) {
       comment += `**Schema build requried:** Disabled\n`

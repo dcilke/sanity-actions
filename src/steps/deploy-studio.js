@@ -5,7 +5,7 @@ import {createGithubDeployment} from './create-github-deployment.js'
 
 export async function deployStudio(bin, cfg = {}) {
   const enabled = getInput('studio_deploy') === 'true'
-  const outputPath = getInput('studio_output_path')
+  const distPath = getInput('dist_path')
   const schemaRequired = getInput('schema_required') === 'true'
   const buildEnabled = getInput('build') === 'true'
   const {isPR, deploymentId} = cfg
@@ -19,8 +19,8 @@ export async function deployStudio(bin, cfg = {}) {
     const args = ['deploy', '--yes']
 
     // Add build options
-    if (outputPath !== '') {
-      args.push(outputPath)
+    if (distPath !== '') {
+      args.push(distPath)
     }
 
     if (schemaRequired) {

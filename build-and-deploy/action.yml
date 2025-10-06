@@ -26,7 +26,7 @@ inputs:
     description: "Build the project before deploying"
     required: false
     default: "true"
-  studio_output_path:
+  dist_path:
     description: "Studio build output directory"
     required: false
     default: ""
@@ -36,18 +36,6 @@ inputs:
     default: "false"
   studio_no_minify:
     description: "Skip Studio bundle minification"
-    required: false
-    default: "false"
-  schema_path:
-    description: "Path to schema file"
-    required: false
-    default: ""
-  schema_workspace:
-    description: "Name of workspace to generate (defaults to all workspaces)"
-    required: false
-    default: ""
-  schema_enforce_required_fields:
-    description: "Makes the schema generated treat fields marked as required as non-optional"
     required: false
     default: "false"
   schema_required:
@@ -162,12 +150,9 @@ runs:
         INPUT_PATH: ${{ inputs.path }}
         INPUT_CLI_VERSION: ${{ inputs.cli_version }}
         INPUT_BUILD: ${{ inputs.build }}
-        INPUT_STUDIO_OUTPUT_PATH: ${{ inputs.studio_output_path }}
+        INPUT_DIST_PATH: ${{ inputs.dist_path }}
         INPUT_STUDIO_SOURCE_MAPS: ${{ inputs.studio_source_maps }}
         INPUT_STUDIO_NO_MINIFY: ${{ inputs.studio_no_minify }}
-        INPUT_SCHEMA_PATH: ${{ inputs.schema_path }}
-        INPUT_SCHEMA_WORKSPACE: ${{ inputs.schema_workspace }}
-        INPUT_SCHEMA_ENFORCE_REQUIRED_FIELDS: ${{ inputs.schema_enforce_required_fields }}
         INPUT_SCHEMA_REQUIRED: ${{ inputs.schema_required }}
         INPUT_STUDIO_DEPLOY: ${{ inputs.studio_deploy }}
         INPUT_GRAPHQL_DEPLOY: ${{ inputs.graphql_deploy }}

@@ -3,9 +3,7 @@ import {execLive} from '../lib/exec.js'
 
 export async function buildSchema(bin) {
   const enabled = getInput('build') === 'true'
-  const schemaPath = getInput('schema_path')
-  const workspace = getInput('schema_workspace')
-  const enforceRequiredFields = getInput('schema_enforce_required_fields') === 'true'
+  const distPath = getInput('dist_path')
   const required = getInput('schema_required') === 'true'
 
   if (!enabled) {
@@ -14,17 +12,11 @@ export async function buildSchema(bin) {
   }
 
   try {
-    const args = ['schema', 'extract']
+    const args = ['manifest', 'extract']
 
     // Add build options
-    if (schemaPath !== '') {
-      args.push('--path', schemaPath)
-    }
-    if (workspace !== '') {
-      args.push('--workspace', workspace)
-    }
-    if (enforceRequiredFields) {
-      args.push('--enforce-required-fields')
+    if (distPath !== '') {
+      args.push('--path', distPath)
     }
 
     await execLive(bin, args)

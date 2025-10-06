@@ -58,16 +58,9 @@ jobs:
 | Input | Default | Description |
 |-------|---------|-------------|
 | `build` | `"true"` | Run `sanity build` before deploying. |
-| `studio_output_path` | `""` | Directory name for build output (defaults to Sanity's `dist`). |
+| `dist_path` | `""` | Directory name for build output (defaults to Sanity's `dist`). |
 | `studio_source_maps` | `"false"` | Include source maps when building. |
 | `studio_no_minify` | `"false"` | Skip frontend minification. |
-
-### Schema extraction
-| Input | Default | Description |
-|-------|---------|-------------|
-| `schema_path` | `""` | Destination path for exported schema. |
-| `schema_workspace` | `""` | Workspace to generate (leave blank for all). |
-| `schema_enforce_required_fields` | `"false"` | Treat required schema fields as non-optional. |
 | `schema_required` | `"true"` | Fail the run when schema extraction errors. |
 
 ### Deployment controls
@@ -105,12 +98,11 @@ jobs:
 - uses: dcilke/sanity-actions/build-and-deploy@v1
   with:
     token: ${{ secrets.SANITY_DEPLOY_TOKEN }}
-    path: ./studio
+    path: ./dist
     build: true
-    studio_output_path: dist
+    dist_path: dist
     studio_source_maps: true
     studio_no_minify: false
-    schema_path: ./schema.json
     schema_required: true
     graphql_deploy: true
     graphql_override_playground: true

@@ -4,7 +4,7 @@ import {getDirectorySize} from '../lib/fs.js'
 
 export async function buildStudio(bin) {
   const enabled = getInput('build') === 'true'
-  const outputPath = getInput('studio_output_path')
+  const distPath = getInput('dist_path')
   const doSourceMaps = getInput('studio_source_maps') === 'true'
   const noMinify = getInput('studio_no_minify') === 'true'
 
@@ -17,8 +17,8 @@ export async function buildStudio(bin) {
     const args = ['build']
 
     // Add build options
-    if (outputPath !== '') {
-      args.push(outputPath)
+    if (distPath !== '') {
+      args.push(distPath)
     }
     if (doSourceMaps) {
       args.push('--source-maps')
@@ -30,7 +30,7 @@ export async function buildStudio(bin) {
     args.push('--yes')
     await execLive(bin, args)
 
-    const dist = outputPath === '' ? './dist' : outputPath
+    const dist = distPath === '' ? './dist' : distPath
     let distSize
 
     try {
